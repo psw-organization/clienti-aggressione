@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 10% 4%;
+    --foreground: 210 40% 98%;
+
+    --card: 240 10% 6%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 240 10% 6%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Vibrant Emerald Violet for primary UI */
+    --primary: 154 61% 52%;
+    --primary-foreground: 240 10% 4%;
+
+    --secondary: 240 10% 12%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 240 10% 12%;
+    --muted-foreground: 240 5% 65%;
+
+    --accent: 240 10% 16%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 350 89% 60%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Softer, more blended borders */
+    --border: 240 10% 14%;
+    --input: 240 10% 16%;
+    --ring: 154 61% 52%;
+
+    --radius: 0.75rem; /* Smoother corners */
+  }
+
+  .dark {
+    --background: 240 10% 4%;
+    --foreground: 210 40% 98%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground selection:bg-primary/30 selection:text-primary;
+    /* Iniziamo con un font di base se non applicato da next/font */
+  }
+}
+
+/* Custom Utilities for Premium Vibe */
+@layer utilities {
+  .glass-panel {
+    @apply bg-background/60 backdrop-blur-xl border border-white/5 shadow-2xl;
+  }
+  
+  .glass-card {
+    @apply bg-card/60 backdrop-blur-md border border-white/5 shadow-lg transition-all duration-300;
+  }
+  
+  .glass-card:hover {
+    @apply bg-card/80 border-white/10 shadow-primary/10 shadow-xl -translate-y-[2px];
+  }
+
+  .glow-text {
+    @apply text-foreground drop-shadow-[0_0_8px_rgba(255,255,255,0.3)];
+  }
+
+  .bg-mesh {
+    background-image: 
+      radial-gradient(at 0% 0%, hsla(154,61%,52%,0.15) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, hsla(240,100%,70%,0.1) 0px, transparent 50%);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+  }
+}

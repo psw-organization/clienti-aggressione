@@ -1,0 +1,220 @@
+import * as cheerio from "cheerio"
+
+const EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g
+const IGNORE_EXTENSIONS = [".png", ".jpg", ".jpeg", ".gif", ".svg", ".css", ".js", ".woff", ".woff2", ".ico", ".pdf", ".webp", ".mp4"]
+const CONTACT_KEYWORDS = ["contatti", "contact", "chi siamo", "about", "dove siamo", "info"]
+
+// Domini e keyword da escludere (tecnici, spam, placeholder)
+const BLACKLIST_DOMAINS = [
+  "sentry.io", "domain.com", "example.com", "wixpress.com", "wordpress.com", "godaddy.com",
+  "cloudflare.com", "yandex.ru", "qq.com", "google.com", "facebook.com", "instagram.com",
+  "twitter.com", "linkedin.com", "youtube.com", "pinterest.com", "tiktok.com", "snapchat.com",
+  "whatsapp.com", "telegram.org", "skype.com", "microsoft.com", "apple.com", "amazon.com",
+  "shopify.com", "myshopify.com", "squarespace.com", "weebly.com", "jimdo.com", "webnode.com",
+  "1and1.com", "ionos.com", "aruba.it", "register.it", "netsons.com", "serverplan.com",
+  "vhosting-it.com", "keliweb.it", "siteground.com", "bluehost.com", "hostgator.com",
+  "ovh.com", "hetzner.com", "digitalocean.com", "linode.com", "vultr.com", "aws.amazon.com",
+  "azure.microsoft.com", "google.cloud", "herokuapp.com", "vercel.com", "netlify.com",
+  "github.com", "gitlab.com", "bitbucket.org", "npm.js", "npmjs.com", "yarnpkg.com",
+  "stackoverflow.com", "medium.com", "dev.to", "hashnode.com", "reddit.com", "quora.com"
+]
+
+const BLACKLIST_PREFIXES = [
+  "noreply", "no-reply", "donotreply", "postmaster", "webmaster", "abuse", "privacy",
+  "admin", "administrator", "support", "help", "info", "contact", "sales", "marketing",
+  "press", "media", "jobs", "careers", "hr", "recruiting", "recruitment", "billing",
+  "invoice", "accounts", "finance", "legal", "compliance", "security", "sysadmin",
+  "tech", "dev", "developer", "api", "bot", "crawler", "spider", "test", "demo",
+  "example", "sample", "user", "username", "login", "register", "signup", "signin",
+  "subscribe", "unsubscribe", "newsletter", "feedback", "survey", "report", "error",
+  "bug", "issue", "ticket", "request", "order", "purchase", "payment", "refund"
+]
+
+// Prefissi validi per business locali (priorità alta)
+const VALID_PREFIXES = ["info", "contatti", "prenotazioni", "hello", "ciao", "reservation", "booking", "office", "segreteria", "direzione"]
+
+async function fetchHtml(url: string, timeoutMs = 5000): Promise<string | null> {
+  try {
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs)
+
+    const response = await fetch(url, {
+      signal: controller.signal,
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+        "Accept-Language": "it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7",
+      },
+    })
+    
+    clearTimeout(timeoutId)
+
+    if (!response.ok) return null
+    return await response.text()
+  } catch (err) {
+    return null
+  }
+}
+
+function extractEmails(html: string): string[] {
+  const $ = cheerio.load(html)
+  const found = new Set<string>()
+
+  // 1. Cerca nei link mailto:
+  $("a[href^='mailto:']").each((_, el) => {
+    const href = $(el).attr("href")
+    if (href) {
+      const email = href.replace(/^mailto:/i, "").split("?")[0]
+      if (email) found.add(email)
+    }
+  })
+
+  // 2. Cerca nel testo
+  const text = $("body").text()
+  const matches = text.match(EMAIL_REGEX) || []
+  matches.forEach(email => found.add(email))
+
+  // Filtra
+  const filtered = Array.from(found).filter(email => {
+    const lower = email.toLowerCase()
+    
+    // Filtri estensioni
+    if (IGNORE_EXTENSIONS.some(ext => lower.endsWith(ext))) return false
+    
+    // Filtri domini blacklist
+    const domain = lower.split("@")[1]
+    if (BLACKLIST_DOMAINS.some(d => domain.includes(d))) return false
+
+    // Filtri prefissi blacklist (solo se non sono nella whitelist dei validi)
+    const prefix = lower.split("@")[0]
+    // if (BLACKLIST_PREFIXES.includes(prefix) && !VALID_PREFIXES.includes(prefix)) return false // Commentato per ora, meglio essere permissivi sui prefissi comuni come 'info'
+
+    // Filtri specifici per spam noti
+    if (lower.includes("sentry")) return false
+    if (lower.includes("noreply")) return false
+    if (lower.includes("no-reply")) return false
+    if (lower.includes("example.com")) return false
+    if (lower.includes("wixpress.com")) return false
+    if (lower.includes("u00")) return false // Unicode escape sequence artifacts
+
+    return true
+  })
+
+  // Ordina per priorità (info@, contatti@, ecc. prima)
+  return filtered.sort((a, b) => {
+    const aLower = a.toLowerCase()
+    const bLower = b.toLowerCase()
+    
+    const aValid = VALID_PREFIXES.some(p => aLower.startsWith(p))
+    const bValid = VALID_PREFIXES.some(p => bLower.startsWith(p))
+
+    if (aValid && !bValid) return -1
+    if (!aValid && bValid) return 1
+    return 0
+  })
+}
+
+// Funzione per cercare su Google (simulato) email dai social
+async function searchSocialEmail(businessName: string): Promise<string | null> {
+  // Se c'è la chiave SERPAPI, usa quella per risultati migliori
+  if (process.env.SERPAPI_KEY) {
+    try {
+      console.log(`🔎 Searching social email via SerpApi for: ${businessName}`)
+      const query = `${businessName} email site:facebook.com OR site:instagram.com`
+      const url = `https://serpapi.com/search.json?q=${encodeURIComponent(query)}&api_key=${process.env.SERPAPI_KEY}&num=5`
+      
+      const res = await fetch(url)
+      const json = await res.json()
+      
+      if (json.organic_results) {
+        for (const result of json.organic_results) {
+          const snippet = result.snippet || ""
+          const title = result.title || ""
+          const emails = extractEmails(snippet + " " + title)
+          if (emails.length > 0) {
+            console.log(`🎉 Found social email via SerpApi for ${businessName}: ${emails[0]}`)
+            return emails[0]
+          }
+        }
+      }
+    } catch (e) {
+      console.error("SerpApi error:", e)
+    }
+  }
+
+  // Fallback: Simuliamo una ricerca Google per trovare profili social con email
+  // Usiamo DuckDuckGo HTML version che è più facile da scrapare senza API key
+  const query = `${businessName} email site:facebook.com OR site:instagram.com`
+  const searchUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`
+
+  console.log(`🔎 Searching social email (DDG fallback) for: ${businessName}`)
+  
+  const html = await fetchHtml(searchUrl, 8000)
+  if (!html) return null
+
+  // Cerca email negli snippet dei risultati di ricerca
+  const emails = extractEmails(html)
+  
+  if (emails.length > 0) {
+    console.log(`🎉 Found social email for ${businessName}: ${emails[0]}`)
+    return emails[0]
+  }
+
+  return null
+}
+
+export async function scrapeEmailFromUrl(startUrl: string | null, businessName: string): Promise<string | null> {
+  
+  // 1. Se c'è un sito web, prova prima lì (metodo classico)
+  if (startUrl) {
+    let baseUrl: URL
+    try {
+      const urlStr = startUrl.startsWith("http") ? startUrl : `https://${startUrl}`
+      baseUrl = new URL(urlStr)
+      
+      console.log(`🔍 Scraping website: ${baseUrl.href}`)
+      const homeHtml = await fetchHtml(baseUrl.href)
+      
+      if (homeHtml) {
+        let emails = extractEmails(homeHtml)
+        if (emails.length > 0) {
+          console.log(`✅ Email found on website: ${emails[0]}`)
+          return emails[0]
+        }
+
+        // Cerca pagine contatti interne
+        const $ = cheerio.load(homeHtml)
+        const contactLinks = new Set<string>()
+
+        $("a").each((_, el) => {
+          const href = $(el).attr("href")
+          const text = $(el).text().toLowerCase()
+          if (!href) return
+
+          if (CONTACT_KEYWORDS.some(kw => text.includes(kw) || href.toLowerCase().includes(kw))) {
+            try {
+              const absoluteUrl = new URL(href, baseUrl.href).href
+              if (absoluteUrl.startsWith(baseUrl.origin)) contactLinks.add(absoluteUrl)
+            } catch {}
+          }
+        })
+
+        // Visita pagine contatti
+        for (const link of Array.from(contactLinks).slice(0, 2)) {
+          const pageHtml = await fetchHtml(link)
+          if (pageHtml) {
+            const pageEmails = extractEmails(pageHtml)
+            if (pageEmails.length > 0) {
+              console.log(`✅ Email found on contact page: ${pageEmails[0]}`)
+              return pageEmails[0]
+            }
+          }
+        }
+      }
+    } catch {}
+  }
+
+  // 2. Se non trovata sul sito (o se non c'è sito), cerca su Social via Motore di Ricerca
+  console.log(`⚠️ Email not found on website, searching social media...`)
+  return await searchSocialEmail(businessName)
+}

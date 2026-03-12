@@ -1,0 +1,35 @@
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
+import "./globals.css";
+
+import { AppSessionProvider } from "@/app/session-provider";
+
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+export const metadata: Metadata = {
+  title: "FoodLead Engine",
+  description:
+    "Tool interno Providence Studio Web per ricerca e gestione lead food con scoring e deduplica.",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="it" className="dark">
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <AppSessionProvider>{children}</AppSessionProvider>
+      </body>
+    </html>
+  );
+}

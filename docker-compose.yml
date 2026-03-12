@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:16
+    container_name: foodlead_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: foodlead
+      POSTGRES_PASSWORD: foodlead
+      POSTGRES_DB: foodlead
+    ports:
+      - "5432:5432"
+    volumes:
+      - foodlead_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foodlead -d foodlead"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  foodlead_pgdata:
+    name: foodlead_pgdata
