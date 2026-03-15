@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { ProviderSearch } from "@/components/leads/provider-search"
+import { StatusSelect } from "@/components/leads/status-select"
 
 import { providers as availableProviders } from "@/lib/providers/registry"
 import { supabaseAdmin } from "@/lib/supabase/admin"
@@ -293,20 +294,7 @@ export default async function LeadsPage({
                       {l.hasOfficialWebsite ? <Badge variant="outline" className="border-green-200 text-green-700 bg-green-50">Sì</Badge> : <Badge variant="danger">No</Badge>}
                     </TableCell>
                     <TableCell>
-                      <form action={updateLeadStatusAction.bind(null, l.id)}>
-                        <select
-                          name="status"
-                          defaultValue={l.status}
-                          className="h-8 rounded-md border border-input bg-background px-2 py-1 text-xs font-medium focus:ring-1 focus:ring-ring"
-                          onChange={(e) => e.currentTarget.form?.requestSubmit()}
-                        >
-                          <option value="new">Nuovo</option>
-                          <option value="reviewed">Verificato</option>
-                          <option value="contacted">Contattato</option>
-                          <option value="qualified">Qualificato</option>
-                          <option value="discarded">Scartato</option>
-                        </select>
-                      </form>
+                      <StatusSelect action={updateLeadStatusAction.bind(null, l.id)} defaultValue={l.status} />
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">
                       {new Date(l.updatedAt).toLocaleDateString("it-IT")}
