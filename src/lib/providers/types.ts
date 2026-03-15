@@ -1,6 +1,6 @@
 import { z } from "zod"
 
-export const providerIdSchema = z.enum(["mock", "google", "serpapi", "parsehub"])
+export const providerIdSchema = z.enum(["mock", "google", "serpapi", "serpapi_region", "parsehub"])
 export type ProviderId = z.infer<typeof providerIdSchema>
 
 export const providerSearchSchema = z.object({
