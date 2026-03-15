@@ -24,13 +24,13 @@ export function buildDedupeKey(input: {
   }
 }
 
-type PrismaLike = {
+type LeadStoreLike = {
   lead: {
     findFirst: (args: unknown) => Promise<any>
   }
 }
 
-export async function findPotentialDuplicate(prisma: PrismaLike, key: DedupeKey): Promise<any | null> {
+export async function findPotentialDuplicate(store: LeadStoreLike, key: DedupeKey): Promise<any | null> {
   const or: { [k: string]: unknown }[] = []
   if (key.normalizedPhone) or.push({ normalizedPhone: key.normalizedPhone })
   if (key.normalizedEmail) or.push({ normalizedEmail: key.normalizedEmail })
@@ -42,5 +42,5 @@ export async function findPotentialDuplicate(prisma: PrismaLike, key: DedupeKey)
 
   if (or.length === 0) return null
 
-  return prisma.lead.findFirst({ where: { OR: or as any[] }, orderBy: { updatedAt: "desc" } })
+  return store.lead.findFirst({ where: { OR: or as any[] }, orderBy: { updatedAt: "desc" } })
 }

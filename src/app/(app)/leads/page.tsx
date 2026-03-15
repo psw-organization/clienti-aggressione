@@ -1,6 +1,5 @@
 import Link from "next/link"
 
-import { prisma } from "@/lib/db"
 import { leadListFiltersSchema } from "@/lib/leads/lead-filters"
 import { createLeadAction, deleteLeadAction, updateLeadStatusAction } from "@/app/(app)/leads/actions"
 import { Badge } from "@/components/ui/badge"
@@ -13,6 +12,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { ProviderSearch } from "@/components/leads/provider-search"
 
 import { providers as availableProviders } from "@/lib/providers/registry"
+import { supabaseAdmin } from "@/lib/supabase/admin"
 
 export default async function LeadsPage({
   searchParams,
@@ -52,71 +52,66 @@ export default async function LeadsPage({
 
   const f = parsed.success ? parsed.data : {}
 
-  const and: any[] = []
-  if (f.q) {
-    and.push({
-      OR: [
-        { businessName: { contains: f.q, mode: "insensitive" } },
-        { email: { contains: f.q, mode: "insensitive" } },
-        { phone: { contains: f.q, mode: "insensitive" } },
-        { officialWebsiteUrl: { contains: f.q, mode: "insensitive" } },
-      ],
-    })
-  }
-  if (f.region) and.push({ region: { equals: f.region, mode: "insensitive" } })
-  if (f.province) and.push({ province: { equals: f.province, mode: "insensitive" } })
-  if (f.city) and.push({ city: { equals: f.city, mode: "insensitive" } })
-  if (f.category) and.push({ category: { equals: f.category, mode: "insensitive" } })
-  if (f.status) and.push({ status: f.status })
-  if (typeof f.ratingMin === "number") and.push({ rating: { gte: f.ratingMin } })
-  if (typeof f.reviewsMin === "number") and.push({ reviewsCount: { gte: f.reviewsMin } })
-  if (f.onlyNoWebsite) and.push({ hasOfficialWebsite: false })
-  if (f.excludeChains) and.push({ chainDetected: false })
-
-  const where = and.length ? { AND: and } : undefined
-
   const orderBy =
     f.sort === "updated"
-      ? { updatedAt: "desc" as const }
+      ? "updatedAt"
       : f.sort === "score"
-        ? { leadScore: "desc" as const }
-        : { createdAt: "desc" as const }
+        ? "leadScore"
+        : "createdAt"
 
-  const leads = await prisma.lead.findMany({
-    where: where as any,
-    orderBy,
-    take: 200,
-    select: {
-      id: true,
-      businessName: true,
-      city: true,
-      province: true,
-      region: true,
-      category: true,
-      rating: true,
-      reviewsCount: true,
-      hasOfficialWebsite: true,
-      leadScore: true,
-      priorityLevel: true,
-      status: true,
-      provider: true,
-      updatedAt: true,
-    },
-  })
+  let leadsQuery = supabaseAdmin
+    .from("Lead")
+    .select(
+      "id,businessName,city,province,region,category,rating,reviewsCount,hasOfficialWebsite,leadScore,priorityLevel,status,provider,updatedAt"
+    )
+    .order(orderBy, { ascending: false })
+    .limit(200)
 
-  const [kpiTotal, kpiNew, kpiHigh, kpiNoSite] = await Promise.all([
-    prisma.lead.count(),
-    prisma.lead.count({ where: { status: "new" } }),
-    prisma.lead.count({ where: { priorityLevel: "high" } }),
-    prisma.lead.count({ where: { hasOfficialWebsite: false } }),
+  if (f.q) {
+    const q = `%${f.q}%`
+    leadsQuery = leadsQuery.or(
+      `businessName.ilike.${q},email.ilike.${q},phone.ilike.${q},officialWebsiteUrl.ilike.${q}`
+    )
+  }
+  if (f.region) leadsQuery = leadsQuery.ilike("region", f.region)
+  if (f.province) leadsQuery = leadsQuery.ilike("province", f.province)
+  if (f.city) leadsQuery = leadsQuery.ilike("city", f.city)
+  if (f.category) leadsQuery = leadsQuery.ilike("category", f.category)
+  if (f.status) leadsQuery = leadsQuery.eq("status", f.status)
+  if (typeof f.ratingMin === "number") leadsQuery = leadsQuery.gte("rating", f.ratingMin)
+  if (typeof f.reviewsMin === "number") leadsQuery = leadsQuery.gte("reviewsCount", f.reviewsMin)
+  if (f.onlyNoWebsite) leadsQuery = leadsQuery.eq("hasOfficialWebsite", false)
+  if (f.excludeChains) leadsQuery = leadsQuery.eq("chainDetected", false)
+
+  const { data: leads, error: leadsError } = await leadsQuery
+  if (leadsError) {
+    throw new Error(leadsError.message)
+  }
+
+  const [kpiTotalRes, kpiNewRes, kpiHighRes, kpiNoSiteRes] = await Promise.all([
+    supabaseAdmin.from("Lead").select("id", { count: "exact", head: true }),
+    supabaseAdmin.from("Lead").select("id", { count: "exact", head: true }).eq("status", "new"),
+    supabaseAdmin.from("Lead").select("id", { count: "exact", head: true }).eq("priorityLevel", "high"),
+    supabaseAdmin.from("Lead").select("id", { count: "exact", head: true }).eq("hasOfficialWebsite", false),
   ])
 
-  const providerConfigs = await prisma.providerConfig.findMany({
-    select: { providerId: true, enabled: true },
-  })
+  const kpiTotal = kpiTotalRes.count ?? 0
+  const kpiNew = kpiNewRes.count ?? 0
+  const kpiHigh = kpiHighRes.count ?? 0
+  const kpiNoSite = kpiNoSiteRes.count ?? 0
+
+  const { data: providerConfigs, error: providerConfigsError } = await supabaseAdmin
+    .from("ProviderConfig")
+    .select("providerId,enabled")
+
+  if (providerConfigsError) {
+    throw new Error(providerConfigsError.message)
+  }
 
   const providerOptions = Object.values(availableProviders).map((p) => {
-    const cfg = providerConfigs.find((c: { providerId: string; enabled: boolean }) => c.providerId === p.id)
+    const cfg = (providerConfigs as { providerId: string; enabled: boolean }[] | null)?.find(
+      (c: { providerId: string; enabled: boolean }) => c.providerId === p.id
+    )
     return {
       providerId: p.id,
       name: p.name,
@@ -273,7 +268,7 @@ export default async function LeadsPage({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {(leads as unknown as LeadRow[]).map((l) => (
+                {((leads ?? []) as unknown as LeadRow[]).map((l) => (
                   <TableRow key={l.id} className="hover:bg-white/5 transition-colors cursor-pointer group">
                     <TableCell>
                       <div className="flex items-center gap-2">
@@ -325,7 +320,7 @@ export default async function LeadsPage({
                     </TableCell>
                   </TableRow>
                 ))}
-                {leads.length === 0 ? (
+                {(leads ?? []).length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={9} className="py-8 text-center text-sm text-muted-foreground">
                       Nessun lead trovato.

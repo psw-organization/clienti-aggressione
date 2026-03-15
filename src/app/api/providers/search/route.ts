@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 
-import { prisma } from "@/lib/db"
 import { providers } from "@/lib/providers/registry"
 import { providerIdSchema, providerSearchSchema } from "@/lib/providers/types"
+import { supabaseAdmin } from "@/lib/supabase/admin"
 
 const bodySchema = providerSearchSchema.extend({
   providerId: providerIdSchema.default("mock"),
@@ -27,45 +27,55 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Provider non supportato" }, { status: 400 })
   }
 
-  const cfg = await prisma.providerConfig.findUnique({ where: { providerId } })
-  if (cfg && !cfg.enabled) {
+  const { data: cfg } = await supabaseAdmin
+    .from("ProviderConfig")
+    .select("enabled")
+    .eq("providerId", providerId)
+    .maybeSingle()
+  if ((cfg as { enabled?: boolean } | null)?.enabled === false) {
     return NextResponse.json({ error: "Provider disabilitato" }, { status: 400 })
   }
 
-  const job = await prisma.searchJob.create({
-    data: {
+  const { data: job, error: jobError } = await supabaseAdmin
+    .from("SearchJob")
+    .insert({
       providerId,
       status: "running",
       params: JSON.stringify({ ...parsed.data, limit: parsed.data.limit ?? 30 }),
       rawResultsCount: 0,
       validResults: 0,
-    },
-    select: { id: true },
-  })
+    })
+    .select("id")
+    .single()
+
+  if (jobError || !job) {
+    return NextResponse.json({ error: "Impossibile creare il job di ricerca" }, { status: 500 })
+  }
+  const jobId = (job as { id: string }).id
 
   try {
     const query = { ...parsed.data, limit: parsed.data.limit ?? 30 }
     const items = await provider.search(query)
-    await prisma.searchJob.update({
-      where: { id: job.id },
-      data: {
+    await supabaseAdmin
+      .from("SearchJob")
+      .update({
         status: "completed",
         rawResultsCount: items.length,
         validResults: items.length,
-        finishedAt: new Date(),
-      },
-    })
+        finishedAt: new Date().toISOString(),
+      })
+      .eq("id", jobId)
 
-    return NextResponse.json({ jobId: job.id, items })
+    return NextResponse.json({ jobId, items })
   } catch (err) {
-    await prisma.searchJob.update({
-      where: { id: job.id },
-      data: {
+    await supabaseAdmin
+      .from("SearchJob")
+      .update({
         status: "failed",
         errorMessage: err instanceof Error ? err.message : "Errore provider",
-        finishedAt: new Date(),
-      },
-    })
+        finishedAt: new Date().toISOString(),
+      })
+      .eq("id", jobId)
     return NextResponse.json({ error: "Errore durante la ricerca" }, { status: 500 })
   }
 }

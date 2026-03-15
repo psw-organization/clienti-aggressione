@@ -1,13 +1,13 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { createBrowserSupabaseClient } from "@/lib/supabase/browser"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -15,21 +15,22 @@ export default function LoginPage() {
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const supabase = createBrowserSupabaseClient()
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
     setLoading(true)
-    const res = await signIn("credentials", {
-      redirect: false,
+    const { error: signInError } = await supabase.auth.signInWithPassword({
       email,
       password,
     })
     setLoading(false)
-    if (!res || res.error) {
-      setError("Credenziali non valide")
+    if (signInError) {
+      setError("Credenziali non valide o utente non presente in Supabase Auth")
       return
     }
+    router.refresh()
     router.push("/leads")
   }
 

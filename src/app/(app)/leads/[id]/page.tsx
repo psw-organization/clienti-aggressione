@@ -1,7 +1,6 @@
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
-import { prisma } from "@/lib/db"
 import { updateLeadAction } from "@/app/(app)/leads/actions"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -9,16 +8,47 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
+import { supabaseAdmin } from "@/lib/supabase/admin"
 
 export default async function LeadDetailPage({ params }: any) {
   const { id } = params
-  const lead = await prisma.lead.findUnique({
-    where: { id },
-    include: { sources: { orderBy: { createdAt: "desc" }, take: 20 } },
-  })
+  type Lead = {
+    id: string
+    businessName: string
+    leadScore: number
+    status: string
+    category: string | null
+    address: string | null
+    city: string | null
+    province: string | null
+    region: string | null
+    phone: string | null
+    email: string | null
+    rating: number | null
+    reviewsCount: number | null
+    internalNotes: string | null
+    provider: string
+    hasOfficialWebsite: boolean
+    officialWebsiteUrl: string | null
+  }
+
+  const { data: leadData, error: leadError } = await supabaseAdmin
+    .from("Lead")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle()
+  if (leadError) notFound()
+  const lead = leadData as Lead | null
   if (!lead) notFound()
 
-  type Source = { id: string; providerId: string; externalId: string; createdAt: Date }
+  const { data: sources } = await supabaseAdmin
+    .from("LeadSource")
+    .select("*")
+    .eq("leadId", id)
+    .order("createdAt", { ascending: false })
+    .limit(20)
+
+  type Source = { id: string; sourceUrl: string; type: string; createdAt: string }
 
   return (
     <div className="space-y-6">
@@ -115,18 +145,18 @@ export default async function LeadDetailPage({ params }: any) {
             <div className="border-t border-border pt-3">
               <div className="text-xs font-medium text-muted-foreground">Sorgenti (ultime 20)</div>
               <div className="mt-2 space-y-2">
-                {lead.sources.length === 0 ? (
+                {(sources ?? []).length === 0 ? (
                   <div className="text-sm text-muted-foreground">Nessuna sorgente registrata.</div>
                 ) : null}
-                {(lead.sources as unknown as Source[]).map((s) => (
+                {((sources ?? []) as unknown as Source[]).map((s) => (
                   <div key={s.id} className="rounded-md border border-border bg-background/40 p-2">
                     <div className="flex items-center justify-between gap-2 text-sm">
-                      <div className="font-medium">{s.providerId}</div>
+                      <div className="font-medium">{s.type}</div>
                       <div className="text-xs text-muted-foreground">
                         {new Date(s.createdAt).toLocaleString("it-IT")}
                       </div>
                     </div>
-                    <div className="mt-1 truncate text-xs text-muted-foreground">{s.externalId}</div>
+                    <div className="mt-1 truncate text-xs text-muted-foreground">{s.sourceUrl}</div>
                   </div>
                 ))}
               </div>

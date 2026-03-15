@@ -1,11 +1,10 @@
-import { getServerSession } from "next-auth"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { LogOut, Search, Settings } from "lucide-react"
 
-import { authOptions } from "@/lib/auth"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { createServerSupabaseClient } from "@/lib/supabase/server"
 
 function NavLink({ href, label, icon }: { href: string; label: string; icon: React.ReactNode }) {
   return (
@@ -23,8 +22,11 @@ function NavLink({ href, label, icon }: { href: string; label: string; icon: Rea
 }
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.id) redirect("/login")
+  const supabase = await createServerSupabaseClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) redirect("/login")
 
   return (
     <div className="min-h-screen bg-background bg-mesh text-foreground">
@@ -46,10 +48,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <div className="mt-auto pt-6">
             <div className="rounded-lg border border-white/5 bg-white/5 p-3 mb-3">
               <div className="text-xs font-medium text-muted-foreground mb-1">Account</div>
-              <div className="truncate text-sm font-medium">{session.user.email}</div>
+              <div className="truncate text-sm font-medium">{user.email}</div>
             </div>
 
-            <form action="/api/auth/signout" method="post">
+            <form action="/api/auth/logout" method="post">
               <Button type="submit" variant="outline" className="w-full justify-start border-white/10 bg-transparent hover:bg-white/10 transition-colors">
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout

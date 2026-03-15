@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 
-import { prisma } from "@/lib/db"
 import { providerIdSchema } from "@/lib/providers/types"
 import type { ProviderLead } from "@/lib/providers/types"
 import { slugify, withSuffix } from "@/lib/slug"
@@ -13,9 +12,10 @@ import {
   normalizePhone,
 } from "@/lib/leads/normalize"
 import { classifyWebsite } from "@/lib/leads/website-detection"
-import { buildDedupeKey, findPotentialDuplicate } from "@/lib/leads/dedupe"
+import { buildDedupeKey } from "@/lib/leads/dedupe"
 import type { ScoringConfig } from "@/lib/leads/scoring"
 import { scoreLead } from "@/lib/leads/scoring"
+import { supabaseAdmin } from "@/lib/supabase/admin"
 
 const providerLeadSchema = z.object({
   externalId: z.string().min(1),
@@ -50,7 +50,7 @@ const bodySchema = z.object({
 async function uniqueSlug(base: string) {
   let slug = base
   for (let i = 0; i < 4; i += 1) {
-    const exists = await prisma.lead.findUnique({ where: { slug }, select: { id: true } })
+    const { data: exists } = await supabaseAdmin.from("Lead").select("id").eq("slug", slug).maybeSingle()
     if (!exists) return slug
     slug = withSuffix(base)
   }
@@ -66,24 +66,30 @@ function reviewsRange(reviewsCount: number | null | undefined) {
 
 export async function POST(req: Request) {
   const json = await req.json().catch(() => null)
-  console.log("Import Payload:", JSON.stringify(json, null, 2)) // Debug log
 
   const parsed = bodySchema.safeParse(json)
   if (!parsed.success) {
-    console.error("Import Validation Error:", parsed.error)
     return NextResponse.json({ error: "Payload non valido", details: parsed.error }, { status: 400 })
   }
 
   const providerId = parsed.data.providerId
   const items = parsed.data.items as ProviderLead[]
 
-  const [domains, scoringRow] = await Promise.all([
-    prisma.blacklistDomain.findMany({ select: { domain: true } }),
-    prisma.scoringConfig.findUnique({ where: { key: "default" }, select: { config: true } }),
+  const [domainsRes, scoringRes] = await Promise.all([
+    supabaseAdmin.from("BlacklistDomain").select("domain"),
+    supabaseAdmin.from("ScoringConfig").select("config").eq("key", "default").maybeSingle(),
   ])
 
-  const blacklistDomains = domains.map((d: { domain: string }) => d.domain)
-  const scoringCfgRaw = scoringRow?.config as unknown as string | undefined
+  if (domainsRes.error) {
+    return NextResponse.json({ error: "Errore lettura blacklist domini" }, { status: 500 })
+  }
+
+  if (scoringRes.error) {
+    return NextResponse.json({ error: "Errore lettura configurazione scoring" }, { status: 500 })
+  }
+
+  const blacklistDomains = (domainsRes.data ?? []).map((d: { domain: string }) => d.domain)
+  const scoringCfgRaw = (scoringRes.data as { config?: string } | null)?.config
   const scoringCfg = scoringCfgRaw ? JSON.parse(scoringCfgRaw) : undefined
   
   if (!scoringCfg) {
@@ -114,7 +120,38 @@ export async function POST(req: Request) {
       email: item.email,
     })
 
-    const existing = await findPotentialDuplicate(prisma as any, key)
+    let existing: any | null = null
+    if (key.normalizedPhone) {
+      const { data } = await supabaseAdmin
+        .from("Lead")
+        .select("*")
+        .eq("normalizedPhone", key.normalizedPhone)
+        .order("updatedAt", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      existing = data
+    }
+    if (!existing && key.normalizedEmail) {
+      const { data } = await supabaseAdmin
+        .from("Lead")
+        .select("*")
+        .eq("normalizedEmail", key.normalizedEmail)
+        .order("updatedAt", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      existing = data
+    }
+    if (!existing && key.normalizedName && key.normalizedCity) {
+      const { data } = await supabaseAdmin
+        .from("Lead")
+        .select("*")
+        .eq("normalizedName", key.normalizedName)
+        .ilike("city", key.normalizedCity)
+        .order("updatedAt", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      existing = data
+    }
 
     const scored = scoreLead(scoringCfg, {
       hasOfficialWebsite,
@@ -162,9 +199,9 @@ export async function POST(req: Request) {
     }
 
     if (existing?.id) {
-      await prisma.lead.update({
-        where: { id: existing.id },
-        data: {
+      const { error } = await supabaseAdmin
+        .from("Lead")
+        .update({
           businessName: data.businessName,
           category: existing.category ?? data.category,
           address: existing.address ?? data.address,
@@ -196,17 +233,21 @@ export async function POST(req: Request) {
           normalizedPhone: existing.normalizedPhone ?? data.normalizedPhone,
           normalizedEmail: existing.normalizedEmail ?? data.normalizedEmail,
           normalizedDomain: existing.normalizedDomain ?? data.normalizedDomain,
-        },
-      })
+        })
+        .eq("id", existing.id)
 
-      // LeadSource creation removed as schema expects sourceUrl/type, not providerId/payload.
-      // Provider raw data is already tracked in Lead.providerRaw.
+      if (error) {
+        return NextResponse.json({ error: "Errore aggiornamento lead esistente" }, { status: 500 })
+      }
+
       merged += 1
       continue
     }
 
-    const created = await prisma.lead.create({ data: data as any, select: { id: true } })
-    // LeadSource creation similarly removed here.
+    const { error } = await supabaseAdmin.from("Lead").insert(data as any)
+    if (error) {
+      return NextResponse.json({ error: "Errore creazione lead" }, { status: 500 })
+    }
     imported += 1
   }
 
