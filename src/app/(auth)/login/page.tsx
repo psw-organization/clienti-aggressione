@@ -9,6 +9,15 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser"
 
+function mapAuthError(message: string) {
+  const m = message.toLowerCase()
+  if (m.includes("invalid login credentials")) return "Email o password non corretti"
+  if (m.includes("email not confirmed")) return "Email non confermata in Supabase Auth"
+  if (m.includes("email logins are disabled")) return "Login con email/password disabilitato su Supabase"
+  if (m.includes("no api key found")) return "Manca NEXT_PUBLIC_SUPABASE_ANON_KEY in ambiente client"
+  return `Errore login Supabase: ${message}`
+}
+
 export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState("")
@@ -27,7 +36,7 @@ export default function LoginPage() {
     })
     setLoading(false)
     if (signInError) {
-      setError("Credenziali non valide o utente non presente in Supabase Auth")
+      setError(mapAuthError(signInError.message))
       return
     }
     router.refresh()
