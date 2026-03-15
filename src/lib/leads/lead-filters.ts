@@ -7,6 +7,7 @@ export const leadListFiltersSchema = z.object({
   city: z.string().optional(),
   category: z.string().optional(),
   status: z.enum(["new", "reviewed", "contacted", "qualified", "discarded"]).optional(),
+  priority: z.enum(["low", "medium", "high"]).optional(),
   ratingMin: z.coerce.number().min(0).max(5).optional(),
   reviewsMin: z.coerce.number().int().min(0).optional(),
   onlyNoWebsite: z.enum(["1"]).optional(),

@@ -40,6 +40,23 @@ const directoryHosts = new Set([
   "it.restaurantguru.com",
 ])
 
+// Suffissi di dominio che identificano siti NON ufficiali (auto-generati, aggregatori, ecc.)
+// Usato per riconoscere host che non corrispondono a un sito web di proprietà dell'attività.
+const directoryHostSuffixes = [
+  ".business.site",      // Google Business Sites (dismesso 2024, spesso dà 404)
+  ".sites.google.com",   // Google Sites
+  ".googleusercontent.com",
+  ".goo.gl",
+]
+
+export function isOfficialWebsiteHost(hostname: string): boolean {
+  const h = hostname.toLowerCase()
+  if (socialHosts.has(h)) return false
+  if (directoryHosts.has(h)) return false
+  if (directoryHostSuffixes.some((suffix) => h.endsWith(suffix) || h === suffix.slice(1))) return false
+  return true
+}
+
 export type WebsitePresence = "official" | "social" | "directory" | "none"
 
 export function classifyWebsite(url: string | null | undefined, blacklistDomains: string[]) {
@@ -62,6 +79,10 @@ export function classifyWebsite(url: string | null | undefined, blacklistDomains
   }
 
   if (host && directoryHosts.has(host)) {
+    return { presence: "directory" as WebsitePresence, domain }
+  }
+
+  if (host && !isOfficialWebsiteHost(host)) {
     return { presence: "directory" as WebsitePresence, domain }
   }
 

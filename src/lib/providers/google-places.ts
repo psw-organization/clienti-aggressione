@@ -1,6 +1,19 @@
 import { z } from "zod"
 import { ProviderLead, ProviderSearchQuery } from "./types"
 import { scrapeEmailFromUrl } from "../email-scraper"
+import { isOfficialWebsiteHost } from "../leads/website-detection"
+
+// Estrae city e codice provincia da un indirizzo italiano formattato
+// Es: "Via Roma 1, 80100 Napoli NA, Italia" → { city: "Napoli", province: "NA" }
+function parseItalianAddress(address?: string): { city?: string; province?: string } {
+  if (!address) return {}
+  const m = address.match(/\b(\d{5})\s+([\wÀ-ú''\s-]+?)\s*([A-Z]{2})?\s*(?:,|$)/)
+  if (!m) return {}
+  return {
+    city: m[2]?.trim() || undefined,
+    province: m[3] || undefined,
+  }
+}
 
 const GOOGLE_PLACES_API_KEY = process.env.GOOGLE_PLACES_API_KEY
 const GOOGLE_PLACES_API_URL = "https://places.googleapis.com/v1/places:searchText"
@@ -131,26 +144,38 @@ export async function googleSearch(query: ProviderSearchQuery): Promise<Provider
       // Filtra per business status (solo operativi)
       // if (place.businessStatus !== "OPERATIONAL") return false // Temporaneamente disabilitato per debug
 
-      // Filtra se richiesto "Solo senza sito"
-      if (query.onlyNoWebsite && place.websiteUri) return false
+      // Filtra solo se ha un sito UFFICIALE (non business.site, social, directory)
+      if (query.onlyNoWebsite && place.websiteUri) {
+        try {
+          const { hostname } = new URL(place.websiteUri)
+          if (isOfficialWebsiteHost(hostname)) return false
+        } catch {
+          // URL malformato → non è un sito ufficiale
+        }
+      }
 
       return true
     })
-    .map((place) => ({
-      externalId: place.id,
-      businessName: place.displayName?.text || place.name.replace(/^places\//, ""), // Usa displayName se presente
-      category: place.types?.[0] || query.category,
-      address: place.formattedAddress,
-      city: query.city, // Google non restituisce sempre città separata facilmente, usiamo input
-      rating: place.rating,
-      reviewsCount: place.userRatingCount,
-      websiteUrl: place.websiteUri,
-      sourceUrl: place.googleMapsUri,
-      phone: place.nationalPhoneNumber,
-      latitude: place.location?.latitude,
-      longitude: place.location?.longitude,
-      raw: place as Record<string, unknown>,
-    }))
+    .map((place) => {
+      const parsed = parseItalianAddress(place.formattedAddress)
+      return {
+        externalId: place.id,
+        businessName: place.displayName?.text || place.name.replace(/^places\//, ""),
+        category: place.types?.[0] || query.category,
+        address: place.formattedAddress,
+        city: query.city || parsed.city,
+        province: query.province || parsed.province,
+        region: query.region,
+        rating: place.rating,
+        reviewsCount: place.userRatingCount,
+        websiteUrl: place.websiteUri,
+        sourceUrl: place.googleMapsUri,
+        phone: place.nationalPhoneNumber,
+        latitude: place.location?.latitude,
+        longitude: place.location?.longitude,
+        raw: place as Record<string, unknown>,
+      }
+    })
 
   // Esegui scraping delle email per i risultati filtrati
   // Questo richiede tempo, quindi si esegue in batch o in parallelo

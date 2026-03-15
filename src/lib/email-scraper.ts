@@ -4,7 +4,6 @@ const EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g
 const IGNORE_EXTENSIONS = [".png", ".jpg", ".jpeg", ".gif", ".svg", ".css", ".js", ".woff", ".woff2", ".ico", ".pdf", ".webp", ".mp4"]
 const CONTACT_KEYWORDS = ["contatti", "contact", "chi siamo", "about", "dove siamo", "info"]
 
-// Domini e keyword da escludere (tecnici, spam, placeholder)
 const BLACKLIST_DOMAINS = [
   "sentry.io", "domain.com", "example.com", "wixpress.com", "wordpress.com", "godaddy.com",
   "cloudflare.com", "yandex.ru", "qq.com", "google.com", "facebook.com", "instagram.com",
@@ -13,25 +12,14 @@ const BLACKLIST_DOMAINS = [
   "shopify.com", "myshopify.com", "squarespace.com", "weebly.com", "jimdo.com", "webnode.com",
   "1and1.com", "ionos.com", "aruba.it", "register.it", "netsons.com", "serverplan.com",
   "vhosting-it.com", "keliweb.it", "siteground.com", "bluehost.com", "hostgator.com",
-  "ovh.com", "hetzner.com", "digitalocean.com", "linode.com", "vultr.com", "aws.amazon.com",
-  "azure.microsoft.com", "google.cloud", "herokuapp.com", "vercel.com", "netlify.com",
-  "github.com", "gitlab.com", "bitbucket.org", "npm.js", "npmjs.com", "yarnpkg.com",
-  "stackoverflow.com", "medium.com", "dev.to", "hashnode.com", "reddit.com", "quora.com"
+  "ovh.com", "hetzner.com", "digitalocean.com", "linode.com", "vultr.com",
+  "herokuapp.com", "vercel.com", "netlify.com",
+  "github.com", "gitlab.com", "bitbucket.org", "npmjs.com",
+  "stackoverflow.com", "medium.com", "reddit.com",
 ]
 
-const BLACKLIST_PREFIXES = [
-  "noreply", "no-reply", "donotreply", "postmaster", "webmaster", "abuse", "privacy",
-  "admin", "administrator", "support", "help", "info", "contact", "sales", "marketing",
-  "press", "media", "jobs", "careers", "hr", "recruiting", "recruitment", "billing",
-  "invoice", "accounts", "finance", "legal", "compliance", "security", "sysadmin",
-  "tech", "dev", "developer", "api", "bot", "crawler", "spider", "test", "demo",
-  "example", "sample", "user", "username", "login", "register", "signup", "signin",
-  "subscribe", "unsubscribe", "newsletter", "feedback", "survey", "report", "error",
-  "bug", "issue", "ticket", "request", "order", "purchase", "payment", "refund"
-]
-
-// Prefissi validi per business locali (priorità alta)
-const VALID_PREFIXES = ["info", "contatti", "prenotazioni", "hello", "ciao", "reservation", "booking", "office", "segreteria", "direzione"]
+// Prefissi validi per business locali (priorità alta nel sorting)
+const VALID_PREFIXES = ["info", "contatti", "prenotazioni", "hello", "ciao", "reservation", "booking", "office", "segreteria", "direzione", "ristorante", "pizzeria", "bar"]
 
 async function fetchHtml(url: string, timeoutMs = 5000): Promise<string | null> {
   try {
@@ -46,12 +34,11 @@ async function fetchHtml(url: string, timeoutMs = 5000): Promise<string | null> 
         "Accept-Language": "it-IT,it;q=0.9,en-US;q=0.8,en;q=0.7",
       },
     })
-    
-    clearTimeout(timeoutId)
 
+    clearTimeout(timeoutId)
     if (!response.ok) return null
     return await response.text()
-  } catch (err) {
+  } catch {
     return null
   }
 }
@@ -60,123 +47,129 @@ function extractEmails(html: string): string[] {
   const $ = cheerio.load(html)
   const found = new Set<string>()
 
-  // 1. Cerca nei link mailto:
+  // 1. Link mailto:
   $("a[href^='mailto:']").each((_, el) => {
     const href = $(el).attr("href")
     if (href) {
-      const email = href.replace(/^mailto:/i, "").split("?")[0]
+      const email = href.replace(/^mailto:/i, "").split("?")[0].trim()
       if (email) found.add(email)
     }
   })
 
-  // 2. Cerca nel testo
+  // 2. Testo body
   const text = $("body").text()
   const matches = text.match(EMAIL_REGEX) || []
-  matches.forEach(email => found.add(email))
+  matches.forEach((email) => found.add(email))
 
-  // Filtra
-  const filtered = Array.from(found).filter(email => {
-    const lower = email.toLowerCase()
-    
-    // Filtri estensioni
-    if (IGNORE_EXTENSIONS.some(ext => lower.endsWith(ext))) return false
-    
-    // Filtri domini blacklist
-    const domain = lower.split("@")[1]
-    if (BLACKLIST_DOMAINS.some(d => domain.includes(d))) return false
-
-    // Filtri prefissi blacklist (solo se non sono nella whitelist dei validi)
-    const prefix = lower.split("@")[0]
-    // if (BLACKLIST_PREFIXES.includes(prefix) && !VALID_PREFIXES.includes(prefix)) return false // Commentato per ora, meglio essere permissivi sui prefissi comuni come 'info'
-
-    // Filtri specifici per spam noti
-    if (lower.includes("sentry")) return false
-    if (lower.includes("noreply")) return false
-    if (lower.includes("no-reply")) return false
-    if (lower.includes("example.com")) return false
-    if (lower.includes("wixpress.com")) return false
-    if (lower.includes("u00")) return false // Unicode escape sequence artifacts
-
-    return true
-  })
-
-  // Ordina per priorità (info@, contatti@, ecc. prima)
-  return filtered.sort((a, b) => {
-    const aLower = a.toLowerCase()
-    const bLower = b.toLowerCase()
-    
-    const aValid = VALID_PREFIXES.some(p => aLower.startsWith(p))
-    const bValid = VALID_PREFIXES.some(p => bLower.startsWith(p))
-
-    if (aValid && !bValid) return -1
-    if (!aValid && bValid) return 1
-    return 0
-  })
+  // Filtri
+  return Array.from(found)
+    .filter((email) => {
+      const lower = email.toLowerCase()
+      if (IGNORE_EXTENSIONS.some((ext) => lower.endsWith(ext))) return false
+      const domain = lower.split("@")[1]
+      if (!domain) return false
+      if (BLACKLIST_DOMAINS.some((d) => domain.includes(d))) return false
+      if (lower.includes("noreply") || lower.includes("no-reply")) return false
+      if (lower.includes("example.com") || lower.includes("wixpress.com")) return false
+      if (lower.includes("u00")) return false // Unicode escape artifacts
+      if (lower.includes("sentry")) return false
+      return true
+    })
+    .sort((a, b) => {
+      const aLower = a.toLowerCase()
+      const bLower = b.toLowerCase()
+      const aValid = VALID_PREFIXES.some((p) => aLower.startsWith(p + "@") || aLower.startsWith(p + "."))
+      const bValid = VALID_PREFIXES.some((p) => bLower.startsWith(p + "@") || bLower.startsWith(p + "."))
+      if (aValid && !bValid) return -1
+      if (!aValid && bValid) return 1
+      return 0
+    })
 }
 
-// Funzione per cercare su Google (simulato) email dai social
-async function searchSocialEmail(businessName: string): Promise<string | null> {
-  // Se c'è la chiave SERPAPI, usa quella per risultati migliori
-  if (process.env.SERPAPI_KEY) {
+// Estrae testo puro da snippet HTML (rimuove tag)
+function stripHtmlTags(html: string): string {
+  return html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()
+}
+
+/**
+ * Cerca email su directory italiane e motori di ricerca via SerpAPI (engine=google).
+ * Molto più efficace di cercare sui social per attività locali.
+ */
+async function searchDirectoryEmail(businessName: string, city?: string): Promise<string | null> {
+  const SERPAPI_KEY = process.env.SERPAPI_KEY
+  if (!SERPAPI_KEY) return null
+
+  const cityStr = city ? ` ${city}` : ""
+
+  // Queries ordinate per probabilità di successo per attività italiane
+  const queries = [
+    `"${businessName}"${cityStr} site:paginegialle.it`,
+    `"${businessName}"${cityStr} contatti email`,
+    `"${businessName}"${cityStr} site:tripadvisor.it`,
+    `"${businessName}"${cityStr} site:tuttocittà.it`,
+  ]
+
+  for (const q of queries) {
+    const url = new URL("https://serpapi.com/search.json")
+    url.searchParams.append("engine", "google")
+    url.searchParams.append("q", q)
+    url.searchParams.append("gl", "it")
+    url.searchParams.append("hl", "it")
+    url.searchParams.append("num", "5")
+    url.searchParams.append("api_key", SERPAPI_KEY)
+
     try {
-      console.log(`🔎 Searching social email via SerpApi for: ${businessName}`)
-      const query = `${businessName} email site:facebook.com OR site:instagram.com`
-      const url = `https://serpapi.com/search.json?q=${encodeURIComponent(query)}&api_key=${process.env.SERPAPI_KEY}&num=5`
-      
-      const res = await fetch(url)
-      const json = await res.json()
-      
-      if (json.organic_results) {
-        for (const result of json.organic_results) {
-          const snippet = result.snippet || ""
-          const title = result.title || ""
-          const emails = extractEmails(snippet + " " + title)
-          if (emails.length > 0) {
-            console.log(`🎉 Found social email via SerpApi for ${businessName}: ${emails[0]}`)
-            return emails[0]
+      console.log(`📂 Directory search: ${q}`)
+      const res = await fetch(url.toString(), { signal: AbortSignal.timeout(8000) })
+      if (!res.ok) continue
+
+      const data = await res.json()
+
+      // Cerca nelle snippet dei risultati organici
+      for (const result of data.organic_results || []) {
+        const text = stripHtmlTags(`${result.snippet || ""} ${result.title || ""}`)
+        const emails = extractEmails(text)
+        if (emails.length > 0) {
+          console.log(`✅ Email found via directory ("${q}"): ${emails[0]}`)
+          return emails[0]
+        }
+      }
+
+      // Se paginegialle.it è nei risultati, prova a scrapare la pagina
+      for (const result of (data.organic_results || []) as Array<{ link?: string }>) {
+        if (result.link?.includes("paginegialle.it")) {
+          const html = await fetchHtml(result.link, 6000)
+          if (html) {
+            const emails = extractEmails(html)
+            if (emails.length > 0) {
+              console.log(`✅ Email scraped from paginegialle: ${emails[0]}`)
+              return emails[0]
+            }
           }
+          break // Prova solo il primo link di paginegialle
         }
       }
     } catch (e) {
-      console.error("SerpApi error:", e)
+      console.error(`[Directory search] Error for "${q}":`, e)
     }
-  }
-
-  // Fallback: Simuliamo una ricerca Google per trovare profili social con email
-  // Usiamo DuckDuckGo HTML version che è più facile da scrapare senza API key
-  const query = `${businessName} email site:facebook.com OR site:instagram.com`
-  const searchUrl = `https://html.duckduckgo.com/html/?q=${encodeURIComponent(query)}`
-
-  console.log(`🔎 Searching social email (DDG fallback) for: ${businessName}`)
-  
-  const html = await fetchHtml(searchUrl, 8000)
-  if (!html) return null
-
-  // Cerca email negli snippet dei risultati di ricerca
-  const emails = extractEmails(html)
-  
-  if (emails.length > 0) {
-    console.log(`🎉 Found social email for ${businessName}: ${emails[0]}`)
-    return emails[0]
   }
 
   return null
 }
 
-export async function scrapeEmailFromUrl(startUrl: string | null, businessName: string): Promise<string | null> {
-  
-  // 1. Se c'è un sito web, prova prima lì (metodo classico)
+export async function scrapeEmailFromUrl(startUrl: string | null, businessName: string, city?: string): Promise<string | null> {
+
+  // 1. Se c'è un sito web, cerca prima lì
   if (startUrl) {
-    let baseUrl: URL
     try {
       const urlStr = startUrl.startsWith("http") ? startUrl : `https://${startUrl}`
-      baseUrl = new URL(urlStr)
-      
+      const baseUrl = new URL(urlStr)
+
       console.log(`🔍 Scraping website: ${baseUrl.href}`)
       const homeHtml = await fetchHtml(baseUrl.href)
-      
+
       if (homeHtml) {
-        let emails = extractEmails(homeHtml)
+        const emails = extractEmails(homeHtml)
         if (emails.length > 0) {
           console.log(`✅ Email found on website: ${emails[0]}`)
           return emails[0]
@@ -190,16 +183,14 @@ export async function scrapeEmailFromUrl(startUrl: string | null, businessName: 
           const href = $(el).attr("href")
           const text = $(el).text().toLowerCase()
           if (!href) return
-
-          if (CONTACT_KEYWORDS.some(kw => text.includes(kw) || href.toLowerCase().includes(kw))) {
+          if (CONTACT_KEYWORDS.some((kw) => text.includes(kw) || href.toLowerCase().includes(kw))) {
             try {
               const absoluteUrl = new URL(href, baseUrl.href).href
               if (absoluteUrl.startsWith(baseUrl.origin)) contactLinks.add(absoluteUrl)
-            } catch {}
+            } catch { /* ignore malformed URLs */ }
           }
         })
 
-        // Visita pagine contatti
         for (const link of Array.from(contactLinks).slice(0, 2)) {
           const pageHtml = await fetchHtml(link)
           if (pageHtml) {
@@ -211,10 +202,10 @@ export async function scrapeEmailFromUrl(startUrl: string | null, businessName: 
           }
         }
       }
-    } catch {}
+    } catch { /* URL non valido o network error */ }
   }
 
-  // 2. Se non trovata sul sito (o se non c'è sito), cerca su Social via Motore di Ricerca
-  console.log(`⚠️ Email not found on website, searching social media...`)
-  return await searchSocialEmail(businessName)
+  // 2. Nessuna email sul sito (o nessun sito): cerca su directory italiane
+  console.log(`⚠️ Trying directory search for: ${businessName}`)
+  return await searchDirectoryEmail(businessName, city)
 }

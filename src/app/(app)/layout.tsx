@@ -1,67 +1,131 @@
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { LogOut, Search, Settings } from "lucide-react"
+import { LogOut, Search, Settings, LayoutGrid, List, Zap, Users, Star } from "lucide-react"
 
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
 
-function NavLink({ href, label, icon }: { href: string; label: string; icon: React.ReactNode }) {
-  return (
-    <Link
-      href={href}
-      className={cn(
-        "flex items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-muted hover:text-foreground",
-        href === "/leads" ? "bg-muted text-foreground" : ""
-      )}
-    >
-      {icon}
-      <span>{label}</span>
-    </Link>
-  )
-}
+const NAV_ITEMS = [
+  { href: "/leads/search",     label: "Ricerca Lead",    icon: Search,      section: "lead" },
+  { href: "/leads",            label: "Elenco Lead",     icon: List,        section: "lead" },
+  { href: "/leads/board",      label: "Pipeline Board",  icon: LayoutGrid,  section: "lead" },
+  { href: "/leads/alta-priorita", label: "Alta Priorità", icon: Star,       section: "lead" },
+]
+
+const SYS_ITEMS = [
+  { href: "/settings", label: "Impostazioni", icon: Settings },
+]
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createServerSupabaseClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect("/login")
 
+  const initials = (user.email ?? "?").slice(0, 2).toUpperCase()
+
   return (
-    <div className="min-h-screen bg-background bg-mesh text-foreground">
-      <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-6 px-4 py-6 md:grid-cols-[260px_1fr]">
-        <aside className="glass-panel rounded-xl flex flex-col md:sticky md:top-6 md:h-[calc(100vh-48px)] p-5">
-          <div className="mb-6 px-2">
-            <div className="text-lg font-bold tracking-tight glow-text flex items-center gap-2">
-              <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-              FoodLead Engine
+    <div className="flex min-h-screen bg-background bg-app-mesh">
+
+      {/* ── SIDEBAR ── */}
+      <aside className="sidebar-panel hidden md:flex flex-col w-[240px] shrink-0 min-h-screen sticky top-0">
+
+        {/* Brand */}
+        <div className="flex items-center gap-2.5 px-5 h-16 border-b border-border shrink-0">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow">
+            <Zap className="h-4 w-4" />
+          </div>
+          <div>
+            <div className="text-sm font-bold tracking-tight text-foreground">LeadHub</div>
+            <div className="text-[10px] text-muted-foreground">Providence Studio</div>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
+
+          <div>
+            <div className="px-2 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Lead
             </div>
-            <div className="text-xs text-muted-foreground mt-1">Providence Studio Web</div>
+            <ul className="space-y-0.5">
+              {NAV_ITEMS.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="nav-link group"
+                  >
+                    <item.icon className="h-4 w-4 shrink-0" />
+                    <span>{item.label}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <nav className="space-y-1">
-            <NavLink href="/leads" label="Lead" icon={<Search className="h-4 w-4" />} />
-            <NavLink href="/settings" label="Settings" icon={<Settings className="h-4 w-4" />} />
-          </nav>
-
-          <div className="mt-auto pt-6">
-            <div className="rounded-lg border border-white/5 bg-white/5 p-3 mb-3">
-              <div className="text-xs font-medium text-muted-foreground mb-1">Account</div>
-              <div className="truncate text-sm font-medium">{user.email}</div>
+          <div>
+            <div className="px-2 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Sistema
             </div>
-
-            <form action="/api/auth/logout" method="post">
-              <Button type="submit" variant="outline" className="w-full justify-start border-white/10 bg-transparent hover:bg-white/10 transition-colors">
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </Button>
-            </form>
+            <ul className="space-y-0.5">
+              {SYS_ITEMS.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className="nav-link">
+                    <item.icon className="h-4 w-4 shrink-0" />
+                    <span>{item.label}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
-        </aside>
+        </nav>
 
-        <main className="glass-panel rounded-xl p-4 md:p-8 overflow-hidden">{children}</main>
+        {/* Footer */}
+        <div className="px-3 py-4 border-t border-border space-y-2 shrink-0">
+          <div className="flex items-center gap-2.5 px-2 py-2">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15 text-primary text-xs font-bold">
+              {initials}
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <div className="truncate text-xs font-medium text-foreground">{user.email}</div>
+            </div>
+            <ThemeToggle />
+          </div>
+
+          <form action="/api/auth/logout" method="post">
+            <button
+              type="submit"
+              className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-xs text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+            >
+              <LogOut className="h-3.5 w-3.5" />
+              Logout
+            </button>
+          </form>
+        </div>
+      </aside>
+
+      {/* ── MOBILE TOPBAR ── */}
+      <div className="md:hidden fixed top-0 left-0 right-0 z-30 h-14 sidebar-panel flex items-center justify-between px-4">
+        <div className="flex items-center gap-2">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Zap className="h-3.5 w-3.5" />
+          </div>
+          <span className="text-sm font-bold">LeadHub</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <ThemeToggle />
+          <Link href="/leads/search" className="nav-link py-1.5 px-2.5"><Search className="h-4 w-4" /></Link>
+          <Link href="/leads/board" className="nav-link py-1.5 px-2.5"><LayoutGrid className="h-4 w-4" /></Link>
+          <Link href="/leads" className="nav-link py-1.5 px-2.5"><List className="h-4 w-4" /></Link>
+        </div>
       </div>
+
+      {/* ── MAIN CONTENT ── */}
+      <main className="flex-1 min-w-0 md:pt-0 pt-14">
+        <div className="max-w-[1200px] mx-auto px-4 py-6 md:px-8 md:py-8">
+          {children}
+        </div>
+      </main>
+
     </div>
   )
 }

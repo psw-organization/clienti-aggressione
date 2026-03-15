@@ -4,78 +4,173 @@
 
 @layer base {
   :root {
-    --background: 240 10% 4%;
-    --foreground: 210 40% 98%;
+    /* ── Light Mode ── */
+    --background: 220 20% 96%;
+    --foreground: 222 24% 10%;
 
-    --card: 240 10% 6%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 24% 10%;
 
-    --popover: 240 10% 6%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 24% 10%;
 
-    /* Vibrant Emerald Violet for primary UI */
-    --primary: 154 61% 52%;
-    --primary-foreground: 240 10% 4%;
+    --primary: 262 80% 55%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 240 10% 12%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 220 14% 92%;
+    --secondary-foreground: 220 14% 30%;
 
-    --muted: 240 10% 12%;
-    --muted-foreground: 240 5% 65%;
+    --muted: 220 14% 92%;
+    --muted-foreground: 220 10% 48%;
 
-    --accent: 240 10% 16%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 262 60% 94%;
+    --accent-foreground: 262 80% 40%;
 
-    --destructive: 350 89% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 78% 55%;
+    --destructive-foreground: 0 0% 100%;
 
-    /* Softer, more blended borders */
-    --border: 240 10% 14%;
-    --input: 240 10% 16%;
-    --ring: 154 61% 52%;
+    --border: 220 14% 87%;
+    --input: 220 14% 87%;
+    --ring: 262 80% 55%;
 
-    --radius: 0.75rem; /* Smoother corners */
+    --radius: 0.75rem;
+
+    /* ── Sidebar ── */
+    --sidebar: 0 0% 100%;
+    --sidebar-border: 220 14% 90%;
   }
 
   .dark {
-    --background: 240 10% 4%;
-    --foreground: 210 40% 98%;
-  }
+    /* ── Dark Mode ── */
+    --background: 222 22% 6%;
+    --foreground: 220 18% 94%;
 
-  * {
-    @apply border-border;
-  }
+    --card: 222 20% 9%;
+    --card-foreground: 220 18% 94%;
 
-  body {
-    @apply bg-background text-foreground selection:bg-primary/30 selection:text-primary;
-    /* Iniziamo con un font di base se non applicato da next/font */
+    --popover: 222 20% 9%;
+    --popover-foreground: 220 18% 94%;
+
+    --primary: 262 80% 68%;
+    --primary-foreground: 222 22% 6%;
+
+    --secondary: 222 18% 14%;
+    --secondary-foreground: 220 14% 72%;
+
+    --muted: 222 18% 13%;
+    --muted-foreground: 220 10% 52%;
+
+    --accent: 262 40% 18%;
+    --accent-foreground: 262 80% 80%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 222 18% 16%;
+    --input: 222 18% 14%;
+    --ring: 262 80% 68%;
+
+    --sidebar: 222 22% 7%;
+    --sidebar-border: 222 18% 14%;
   }
 }
 
-/* Custom Utilities for Premium Vibe */
+@layer base {
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground; }
+  html { @apply antialiased; }
+}
+
+/* ─── Transitions fluide sul cambio tema ─── */
+*, *::before, *::after {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.15s ease;
+}
+/* Non animare transform/scale/opacity per non rallentare le micro-interazioni */
+a, button, [role="button"] {
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.1s ease,
+              box-shadow 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
+}
+
+/* ─── Utility Classes ─── */
 @layer utilities {
-  .glass-panel {
-    @apply bg-background/60 backdrop-blur-xl border border-white/5 shadow-2xl;
-  }
-  
-  .glass-card {
-    @apply bg-card/60 backdrop-blur-md border border-white/5 shadow-lg transition-all duration-300;
-  }
-  
-  .glass-card:hover {
-    @apply bg-card/80 border-white/10 shadow-primary/10 shadow-xl -translate-y-[2px];
+
+  /* Sidebar panel */
+  .sidebar-panel {
+    background-color: hsl(var(--sidebar));
+    border-right: 1px solid hsl(var(--sidebar-border));
   }
 
-  .glow-text {
-    @apply text-foreground drop-shadow-[0_0_8px_rgba(255,255,255,0.3)];
+  /* Main content area */
+  .main-surface {
+    @apply bg-background;
   }
 
-  .bg-mesh {
-    background-image: 
-      radial-gradient(at 0% 0%, hsla(154,61%,52%,0.15) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, hsla(240,100%,70%,0.1) 0px, transparent 50%);
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+  /* Card base */
+  .bento-card {
+    @apply bg-card border border-border rounded-xl shadow-sm;
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+  .bento-card:hover {
+    @apply shadow-md -translate-y-px;
+  }
+
+  /* Nav link */
+  .nav-link {
+    @apply flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground
+           hover:bg-muted hover:text-foreground transition-colors;
+  }
+  .nav-link.active {
+    @apply bg-primary/10 text-primary font-semibold;
+  }
+
+  /* ── Status colors ── */
+
+  /* Lead Status Badges */
+  .status-new       { @apply bg-sky-100 text-sky-700 border-sky-200 dark:bg-sky-500/15 dark:text-sky-400 dark:border-sky-500/25; }
+  .status-reviewed  { @apply bg-violet-100 text-violet-700 border-violet-200 dark:bg-violet-500/15 dark:text-violet-400 dark:border-violet-500/25; }
+  .status-contacted { @apply bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-500/15 dark:text-amber-400 dark:border-amber-500/25; }
+  .status-qualified { @apply bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/25; }
+  .status-discarded { @apply bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-500/15 dark:text-rose-400 dark:border-rose-500/25; }
+
+  /* Score badge colors */
+  .score-high   { @apply bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/25; }
+  .score-medium { @apply bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-500/15 dark:text-amber-400 dark:border-amber-500/25; }
+  .score-low    { @apply bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-500/15 dark:text-rose-400 dark:border-rose-500/25; }
+
+  /* Priority row highlight */
+  .row-high-priority { @apply border-l-2 border-l-rose-400 dark:border-l-rose-500; }
+
+  /* Kanban column backgrounds */
+  .col-new       { @apply bg-sky-50/60 dark:bg-sky-500/5; }
+  .col-reviewed  { @apply bg-violet-50/60 dark:bg-violet-500/5; }
+  .col-contacted { @apply bg-amber-50/60 dark:bg-amber-500/5; }
+  .col-qualified { @apply bg-emerald-50/60 dark:bg-emerald-500/5; }
+  .col-discarded { @apply bg-rose-50/60 dark:bg-rose-500/5; }
+
+  /* Kanban column header */
+  .col-header-new       { @apply border-sky-300 text-sky-700 bg-sky-100 dark:border-sky-500/30 dark:text-sky-400 dark:bg-sky-500/10; }
+  .col-header-reviewed  { @apply border-violet-300 text-violet-700 bg-violet-100 dark:border-violet-500/30 dark:text-violet-400 dark:bg-violet-500/10; }
+  .col-header-contacted { @apply border-amber-300 text-amber-700 bg-amber-100 dark:border-amber-500/30 dark:text-amber-400 dark:bg-amber-500/10; }
+  .col-header-qualified { @apply border-emerald-300 text-emerald-700 bg-emerald-100 dark:border-emerald-500/30 dark:text-emerald-400 dark:bg-emerald-500/10; }
+  .col-header-discarded { @apply border-rose-300 text-rose-700 bg-rose-100 dark:border-rose-500/30 dark:text-rose-400 dark:bg-rose-500/10; }
+
+  /* Bento stat card accents */
+  .stat-blue    { @apply border-l-4 border-l-sky-400; }
+  .stat-violet  { @apply border-l-4 border-l-violet-400; }
+  .stat-amber   { @apply border-l-4 border-l-amber-400; }
+  .stat-emerald { @apply border-l-4 border-l-emerald-400; }
+  .stat-rose    { @apply border-l-4 border-l-rose-400; }
+
+  /* Mesh background for app shell */
+  .bg-app-mesh {
+    background-color: hsl(var(--background));
+    background-image:
+      radial-gradient(at 0% 0%, hsla(262, 80%, 55%, 0.06) 0px, transparent 60%),
+      radial-gradient(at 100% 100%, hsla(220, 14%, 80%, 0.06) 0px, transparent 60%);
+  }
+  .dark .bg-app-mesh {
+    background-image:
+      radial-gradient(at 0% 0%, hsla(262, 80%, 68%, 0.08) 0px, transparent 60%),
+      radial-gradient(at 100% 100%, hsla(222, 22%, 12%, 0.4) 0px, transparent 60%);
   }
 }

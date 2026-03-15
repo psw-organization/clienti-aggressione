@@ -2,6 +2,8 @@ import { z } from "zod"
 
 export const providerIdSchema = z.enum(["mock", "google", "serpapi", "serpapi_region", "parsehub"])
 export type ProviderId = z.infer<typeof providerIdSchema>
+export const providerSelectionSchema = z.enum(["auto", "mock", "google", "serpapi", "serpapi_region", "parsehub"])
+export type ProviderSelection = z.infer<typeof providerSelectionSchema>
 
 export const providerSearchSchema = z.object({
   providerId: providerIdSchema.default("mock"),
@@ -45,4 +47,14 @@ export type ProviderLead = {
 export type ProviderSearchResponse = {
   jobId: string
   items: ProviderLead[]
+  requestedProvider: ProviderSelection
+  resolvedProvider: ProviderId
+  fallbackProvider?: ProviderId
+  usedFallback: boolean
+  reasons: string[]
+  counts: {
+    primary: number
+    fallback: number
+    final: number
+  }
 }

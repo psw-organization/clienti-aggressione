@@ -1,61 +1,250 @@
--------------------------------------------
-Copied 50 logs from Vercel Dashboard
-- Project: clienti-aggressione (prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB)
-- Team: providence-studio-web (team_sWREmcuwrPtcEJ25B7jxvN7J)
-- Search query: (no search query applied)
-- Search timestamps: 2026-03-15T18:09:00.000Z to 2026-03-15T18:39:00.000Z
-- Dashboard URL: https://vercel.com/providence-studio-web/clienti-aggressione/logs
-- Format: JSONL
-- Documentation: https://vercel.com/docs/logs/runtime
--------------------------------------------
+   ▲ Next.js 15.5.12
+   - Local:        http://localhost:3002
+   - Network:      http://192.168.1.5:3002
+   - Environments: .env.local
 
-{"requestId":"l9hnh-1773599889382-eb599908366b","timestamp":1773599889382,"deploymentId":"dpl_FqLtJEqnpx7K7wXqLwh4uk4ZSTYX","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":500,"environment":"production","branch":"main","cache":"MISS"}
-{"requestId":"sf8hv-1773599888873-e041b5175a08","timestamp":1773599888873,"deploymentId":"dpl_FqLtJEqnpx7K7wXqLwh4uk4ZSTYX","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione.vercel.app","requestMethod":"GET","requestPath":"/","responseStatusCode":307,"environment":"production","branch":"main","cache":"PRERENDER"}
-{"requestId":"bz2vf-1773599833211-0f90cf5bb2dd","timestamp":1773599833211,"deploymentId":"dpl_FqLtJEqnpx7K7wXqLwh4uk4ZSTYX","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-4a6vc1cw8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/login","responseStatusCode":200,"environment":"production","branch":"main","cache":"HIT"}
-{"requestId":"xnsdz-1773599832987-be99802d2306","timestamp":1773599832987,"deploymentId":"dpl_FqLtJEqnpx7K7wXqLwh4uk4ZSTYX","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-4a6vc1cw8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/login","responseStatusCode":200,"environment":"production","branch":"main","cache":"HIT"}
-{"requestId":"2jscb-1773599832695-fa070b419605","timestamp":1773599832695,"deploymentId":"dpl_FqLtJEqnpx7K7wXqLwh4uk4ZSTYX","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-4a6vc1cw8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/login","responseStatusCode":200,"environment":"production","branch":"main","cache":"HIT"}
-{"requestId":"l7527-1773599832236-fc6bbb67b37f","timestamp":1773599832236,"deploymentId":"dpl_FqLtJEqnpx7K7wXqLwh4uk4ZSTYX","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione-4a6vc1cw8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":307,"environment":"production","branch":"main","cache":"MISS"}
-{"requestId":"lrn28-1773599832225-a68dd64fdbe3","timestamp":1773599832225,"deploymentId":"dpl_FqLtJEqnpx7K7wXqLwh4uk4ZSTYX","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-4a6vc1cw8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/","responseStatusCode":307,"environment":"production","branch":"main","cache":"HIT"}
-{"requestId":"j7q64-1773599832206-a9f47e250842","timestamp":1773599832206,"deploymentId":"dpl_FqLtJEqnpx7K7wXqLwh4uk4ZSTYX","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-4a6vc1cw8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/login","responseStatusCode":200,"environment":"production","branch":"main","cache":"HIT"}
-{"requestId":"g6xc5-1773599832131-622947e4c54c","timestamp":1773599832131,"deploymentId":"dpl_FqLtJEqnpx7K7wXqLwh4uk4ZSTYX","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-4a6vc1cw8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/login","responseStatusCode":200,"environment":"production","branch":"main","cache":"HIT"}
-{"requestId":"hx56h-1773599832065-fb68af2f11e7","timestamp":1773599832065,"deploymentId":"dpl_FqLtJEqnpx7K7wXqLwh4uk4ZSTYX","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione-4a6vc1cw8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":307,"environment":"production","branch":"main","cache":"MISS"}
-{"requestId":"hx56h-1773599832041-beb82e0637e8","timestamp":1773599832041,"deploymentId":"dpl_FqLtJEqnpx7K7wXqLwh4uk4ZSTYX","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-4a6vc1cw8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/","responseStatusCode":307,"environment":"production","branch":"main","cache":"HIT"}
-{"requestId":"qpfhf-1773599831753-54737ad7fbad","timestamp":1773599831753,"deploymentId":"dpl_FqLtJEqnpx7K7wXqLwh4uk4ZSTYX","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione-4a6vc1cw8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":307,"environment":"production","branch":"main","cache":"MISS"}
-{"requestId":"nln22-1773599831741-a1562872e1cc","timestamp":1773599831741,"deploymentId":"dpl_FqLtJEqnpx7K7wXqLwh4uk4ZSTYX","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-4a6vc1cw8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/login","responseStatusCode":200,"environment":"production","branch":"main","cache":"PRERENDER"}
-{"requestId":"2jscb-1773599831740-3586d2f5c3f7","timestamp":1773599831740,"deploymentId":"dpl_FqLtJEqnpx7K7wXqLwh4uk4ZSTYX","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-4a6vc1cw8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/","responseStatusCode":307,"environment":"production","branch":"main","cache":"HIT"}
-{"requestId":"sbgwt-1773599831696-d61ffdd0d4a6","timestamp":1773599831696,"deploymentId":"dpl_FqLtJEqnpx7K7wXqLwh4uk4ZSTYX","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione-4a6vc1cw8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":307,"environment":"production","branch":"main","cache":"MISS"}
-{"requestId":"c7fnn-1773599831678-85a8975ff46d","timestamp":1773599831678,"deploymentId":"dpl_FqLtJEqnpx7K7wXqLwh4uk4ZSTYX","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-4a6vc1cw8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/","responseStatusCode":307,"environment":"production","branch":"main","cache":"HIT"}
-{"requestId":"tgk59-1773599830794-208f43182ac0","timestamp":1773599830794,"deploymentId":"dpl_FqLtJEqnpx7K7wXqLwh4uk4ZSTYX","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione-4a6vc1cw8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":307,"environment":"production","branch":"main","cache":"MISS"}
-{"requestId":"qpsrb-1773599830792-b26057736392","timestamp":1773599830792,"deploymentId":"dpl_FqLtJEqnpx7K7wXqLwh4uk4ZSTYX","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione-4a6vc1cw8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":307,"environment":"production","branch":"main","cache":"MISS"}
-{"requestId":"72p6z-1773599830501-c7d6c12d055f","timestamp":1773599830501,"deploymentId":"dpl_FqLtJEqnpx7K7wXqLwh4uk4ZSTYX","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-4a6vc1cw8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/","responseStatusCode":307,"environment":"production","branch":"main","cache":"PRERENDER"}
-{"requestId":"4z82w-1773599830450-50887f45256f","timestamp":1773599830450,"deploymentId":"dpl_FqLtJEqnpx7K7wXqLwh4uk4ZSTYX","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-4a6vc1cw8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/","responseStatusCode":307,"environment":"production","branch":"main","cache":"PRERENDER"}
-{"requestId":"jj2dz-1773598646556-d4c587594bce","timestamp":1773598646556,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":200,"environment":"production","branch":"main","cache":"MISS"}
-{"requestId":"zdljm-1773598646551-e3583e6927c0","timestamp":1773598646551,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione.vercel.app","requestMethod":"GET","requestPath":"/login","responseStatusCode":200,"environment":"production","branch":"main","cache":"HIT"}
-{"requestId":"8bmwz-1773598643170-808aa6f1e7a5","timestamp":1773598643170,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione.vercel.app","requestMethod":"GET","requestPath":"/login","responseStatusCode":200,"environment":"production","branch":"main","cache":"HIT"}
-{"requestId":"t8ck2-1773598642510-3dd579830784","timestamp":1773598642510,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":307,"environment":"production","branch":"main","cache":"MISS"}
-{"requestId":"jmx88-1773598642463-4396a5162c6d","timestamp":1773598642463,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione.vercel.app","requestMethod":"GET","requestPath":"/","responseStatusCode":307,"environment":"production","branch":"main","cache":"HIT"}
-{"requestId":"k4l52-1773598619845-0ca5fbf2db82","timestamp":1773598619845,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":500,"environment":"production","branch":"main","cache":"MISS"}
-{"requestId":"k4fcs-1773598619513-5483605253cd","timestamp":1773598619513,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione.vercel.app","requestMethod":"GET","requestPath":"/","responseStatusCode":307,"environment":"production","branch":"main","cache":"PRERENDER"}
-{"requestId":"2cpzm-1773598615508-df79fcb69fcf","timestamp":1773598615508,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":500,"environment":"production","branch":"main","cache":"MISS"}
-{"requestId":"kr574-1773598612948-a5d048539412","timestamp":1773598612948,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":500,"environment":"production","branch":"main","cache":"MISS"}
-{"requestId":"q7mxp-1773598588666-08d951c20a48","timestamp":1773598588666,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":200,"environment":"production","branch":"main","cache":"MISS"}
-{"requestId":"rmlbv-1773598588650-dde0eca1cda7","timestamp":1773598588650,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione.vercel.app","requestMethod":"GET","requestPath":"/login","responseStatusCode":200,"environment":"production","branch":"main","cache":"PRERENDER"}
-{"requestId":"fq6s8-1773598584699-3b96cd761872","timestamp":1773598584699,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione.vercel.app","requestMethod":"GET","requestPath":"/login","responseStatusCode":200,"environment":"production","branch":"main","cache":"PRERENDER"}
-{"requestId":"9hznv-1773598583248-2eccfa1d80fc","timestamp":1773598583248,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":307,"environment":"production","branch":"main","cache":"MISS"}
-{"requestId":"7dv9p-1773598511825-a36ce72dfbb8","timestamp":1773598511825,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-6ut1su8p8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/login","responseStatusCode":200,"environment":"production","branch":"main","cache":"HIT"}
-{"requestId":"bjc29-1773598511719-78ca53664dc1","timestamp":1773598511719,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione-6ut1su8p8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":307,"environment":"production","branch":"main","cache":"MISS"}
-{"requestId":"bjc29-1773598511685-c7290fd6cc57","timestamp":1773598511685,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-6ut1su8p8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/","responseStatusCode":307,"environment":"production","branch":"main","cache":"HIT"}
-{"requestId":"fncdm-1773598510496-923564a99568","timestamp":1773598510496,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-6ut1su8p8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/login","responseStatusCode":200,"environment":"production","branch":"main","cache":"HIT"}
-{"requestId":"h65nc-1773598510300-3412f5679f38","timestamp":1773598510300,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione-6ut1su8p8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":307,"environment":"production","branch":"main","cache":"MISS"}
-{"requestId":"mnklw-1773598510233-819f75239c02","timestamp":1773598510233,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-6ut1su8p8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/","responseStatusCode":307,"environment":"production","branch":"main","cache":"HIT"}
-{"requestId":"vgcb5-1773598510132-7eb5368e7a33","timestamp":1773598510132,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-6ut1su8p8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/login","responseStatusCode":200,"environment":"production","branch":"main","cache":"HIT"}
-{"requestId":"jh5cg-1773598510069-578716f10a27","timestamp":1773598510069,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-6ut1su8p8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/login","responseStatusCode":200,"environment":"production","branch":"main","cache":"HIT"}
-{"requestId":"2x5v8-1773598509947-86de06b473f4","timestamp":1773598509947,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione-6ut1su8p8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":307,"environment":"production","branch":"main","cache":"MISS"}
-{"requestId":"p2t2c-1773598509932-dad744568d3d","timestamp":1773598509932,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-6ut1su8p8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/","responseStatusCode":307,"environment":"production","branch":"main","cache":"HIT"}
-{"requestId":"7dv9p-1773598509525-5af6f5c75170","timestamp":1773598509525,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-6ut1su8p8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/login","responseStatusCode":200,"environment":"production","branch":"main","cache":"PRERENDER"}
-{"requestId":"zw6rm-1773598508746-d764418f3701","timestamp":1773598508746,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione-6ut1su8p8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":307,"environment":"production","branch":"main","cache":"MISS"}
-{"requestId":"p2t2c-1773598508719-8b8b3c4dacc6","timestamp":1773598508719,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione-6ut1su8p8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":307,"environment":"production","branch":"main","cache":"MISS"}
-{"requestId":"cjqjk-1773598508506-dc78c243bb08","timestamp":1773598508506,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-6ut1su8p8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/","responseStatusCode":307,"environment":"production","branch":"main","cache":"PRERENDER"}
-{"requestId":"jh5cg-1773598508387-0de6d1081f7f","timestamp":1773598508387,"deploymentId":"dpl_8JPdfu3yxQWbzSe4ePnMJ1rCNr7u","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"info","message":"","source":"static","domain":"clienti-aggressione-6ut1su8p8-providence-studio-web.vercel.app","requestMethod":"GET","requestPath":"/","responseStatusCode":307,"environment":"production","branch":"main","cache":"PRERENDER"}
-{"requestId":"9l8mg-1773598282068-9ea8e7965341","timestamp":1773598282068,"deploymentId":"dpl_GaPzPYqYhQnCKZ121uyBCsX5NHts","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":500,"environment":"production","branch":"main","cache":"MISS"}
-{"requestId":"66f4t-1773598140097-29534ed3ea56","timestamp":1773598140097,"deploymentId":"dpl_GaPzPYqYhQnCKZ121uyBCsX5NHts","projectId":"prj_rNjcojCsH3Ll5rxpBqpnrgDh2lTB","level":"error","message":"Error: Event handlers cannot be passed to Client Component props.\n  {name: \"status\", defaultValue: \"new\", className: ..., onChange: function onChange, children: ...}\n                                                                  ^^^^^^^^^^^^^^^^^\nIf you need interactivity, consider converting part of this to a Client Component.\n    at stringify (<anonymous>) {\n  digest: '228117722'\n}","source":"serverless","domain":"clienti-aggressione.vercel.app","requestMethod":"GET","requestPath":"/leads","responseStatusCode":200,"environment":"production","branch":"main","cache":"MISS"}
+ ✓ Starting...
+ ✓ Ready in 1777ms
+ ○ Compiling / ...
+ ✓ Compiled / in 1114ms (573 modules)
+ GET / 307 in 1482ms
+ ✓ Compiled /leads in 551ms (749 modules)
+ GET /leads 200 in 2297ms
+ ✓ Compiled /_not-found in 387ms (754 modules)
+ GET /@vite/client 404 in 562ms
+ ○ Compiling /leads/search ...
+ ✓ Compiled /leads/search in 820ms (1215 modules)
+ GET /leads/search 200 in 1426ms
+ ○ Compiling /api/providers/search ...
+ ✓ Compiled /api/providers/search in 503ms (1236 modules)
+[RegionScan] Scansione "Toscana": 10 città
+[SerpApi] Searching google_maps: "ristorante Firenze" (3 pages)
+[SerpApi] Searching google_maps: "pizzeria Firenze" (3 pages)
+[SerpApi] Searching google_maps: "pub Firenze" (3 pages)
+[SerpApi] Searching google_maps: "trattoria Firenze" (3 pages)
+[SerpApi] Searching google_maps: "bar Firenze" (3 pages)
+[SerpApi] Searching google_maps: "ristorante Pisa" (3 pages)
+[SerpApi] Searching google_maps: "pizzeria Pisa" (3 pages)
+[SerpApi] Searching google_maps: "pub Pisa" (3 pages)
+[SerpApi] Searching google_maps: "trattoria Pisa" (3 pages)
+[SerpApi] Searching google_maps: "bar Pisa" (3 pages)
+[SerpApi] Searching google_maps: "ristorante Livorno" (3 pages)
+[SerpApi] Searching google_maps: "pizzeria Livorno" (3 pages)
+[SerpApi] Searching google_maps: "pub Livorno" (3 pages)
+[SerpApi] Searching google_maps: "trattoria Livorno" (3 pages)
+[SerpApi] Searching google_maps: "bar Livorno" (3 pages)
+[SerpApi] Searching google_maps: "ristorante Arezzo" (3 pages)
+[SerpApi] Searching google_maps: "pizzeria Arezzo" (3 pages)
+[SerpApi] Searching google_maps: "pub Arezzo" (3 pages)
+[SerpApi] Searching google_maps: "trattoria Arezzo" (3 pages)
+[SerpApi] Searching google_maps: "bar Arezzo" (3 pages)
+[SerpApi] Searching google_maps: "ristorante Siena" (3 pages)
+[SerpApi] Searching google_maps: "pizzeria Siena" (3 pages)
+[SerpApi] Searching google_maps: "pub Siena" (3 pages)
+[SerpApi] Searching google_maps: "trattoria Siena" (3 pages)
+[SerpApi] Searching google_maps: "bar Siena" (3 pages)
+[SerpApi] Searching google_maps: "ristorante Lucca" (3 pages)
+[SerpApi] Searching google_maps: "pizzeria Lucca" (3 pages)
+[SerpApi] Searching google_maps: "pub Lucca" (3 pages)
+[SerpApi] Searching google_maps: "trattoria Lucca" (3 pages)
+[SerpApi] Searching google_maps: "bar Lucca" (3 pages)
+[SerpApi] Searching google_maps: "ristorante Prato" (3 pages)
+[SerpApi] Searching google_maps: "pizzeria Prato" (3 pages)
+[SerpApi] Searching google_maps: "pub Prato" (3 pages)
+[SerpApi] Searching google_maps: "trattoria Prato" (3 pages)
+[SerpApi] Searching google_maps: "bar Prato" (3 pages)
+[SerpApi] Searching google_maps: "ristorante Pistoia" (3 pages)
+[SerpApi] Searching google_maps: "pizzeria Pistoia" (3 pages)
+[SerpApi] Searching google_maps: "pub Pistoia" (3 pages)
+[SerpApi] Searching google_maps: "trattoria Pistoia" (3 pages)
+[SerpApi] Searching google_maps: "bar Pistoia" (3 pages)
+[SerpApi] Searching google_maps: "ristorante Grosseto" (3 pages)
+[SerpApi] Searching google_maps: "pizzeria Grosseto" (3 pages)
+[SerpApi] Searching google_maps: "pub Grosseto" (3 pages)
+[SerpApi] Searching google_maps: "trattoria Grosseto" (3 pages)
+[SerpApi] Searching google_maps: "bar Grosseto" (3 pages)
+[SerpApi] Searching google_maps: "ristorante Massa" (3 pages)
+[SerpApi] Searching google_maps: "pizzeria Massa" (3 pages)
+[SerpApi] Searching google_maps: "pub Massa" (3 pages)
+[SerpApi] Searching google_maps: "trattoria Massa" (3 pages)
+[SerpApi] Searching google_maps: "bar Massa" (3 pages)
+[SerpApi] Page 0 for "pub": 20 results
+[SerpApi] Page 0 for "pizzeria": 20 results
+[SerpApi] Page 0 for "pizzeria": 20 results
+[SerpApi] Page 0 for "bar": 20 results
+[SerpApi] Page 0 for "ristorante": 20 results
+[SerpApi] Page 0 for "ristorante": 20 results
+[SerpApi] Page 0 for "pizzeria": 20 results
+[SerpApi] Page 0 for "ristorante": 20 results
+[SerpApi] Page 0 for "trattoria": 20 results
+[SerpApi] Page 0 for "ristorante": 20 results
+[SerpApi] Page 0 for "bar": 20 results
+[SerpApi] Page 0 for "bar": 20 results
+[SerpApi] Page 0 for "trattoria": 20 results
+[SerpApi] Page 0 for "bar": 20 results
+[SerpApi] Page 0 for "ristorante": 20 results
+[SerpApi] Page 0 for "pub": 20 results
+[SerpApi] Page 0 for "pizzeria": 20 results
+[SerpApi] Page 0 for "trattoria": 20 results
+[SerpApi] Page 0 for "bar": 20 results
+[SerpApi] Page 0 for "bar": 20 results
+[SerpApi] Page 0 for "pub": 20 results
+[SerpApi] Page 0 for "pub": 20 results
+[SerpApi] Page 0 for "trattoria": 20 results
+[SerpApi] Page 0 for "pub": 20 results
+[SerpApi] Page 0 for "bar": 20 results
+[SerpApi] Page 0 for "pizzeria": 20 results
+[SerpApi] Page 0 for "trattoria": 20 results
+[SerpApi] Page 0 for "bar": 20 results
+[SerpApi] Page 0 for "ristorante": 20 results
+[SerpApi] Page 0 for "pizzeria": 20 results
+[SerpApi] Page 0 for "pub": 20 results
+[SerpApi] Page 0 for "ristorante": 20 results
+[SerpApi] Page 1 for "pub": 20 results
+[SerpApi] Page 1 for "pizzeria": 20 results
+[SerpApi] Page 0 for "pizzeria": 20 results
+[SerpApi] Page 0 for "ristorante": 20 results
+[SerpApi] Page 1 for "pizzeria": 20 results
+[SerpApi] Page 0 for "pizzeria": 20 results
+[SerpApi] Page 0 for "bar": 20 results
+[SerpApi] Page 1 for "bar": 20 results
+[SerpApi] Page 0 for "pizzeria": 20 results
+[SerpApi] Page 1 for "ristorante": 20 results
+[SerpApi] Page 1 for "ristorante": 20 results
+[SerpApi] Page 1 for "pub": 20 results
+[SerpApi] Page 1 for "bar": 20 results
+[SerpApi] Page 1 for "bar": 20 results
+[SerpApi] Page 0 for "trattoria": 20 results
+[SerpApi] Page 0 for "trattoria": 20 results
+[SerpApi] Page 1 for "ristorante": 20 results
+[SerpApi] Page 0 for "trattoria": 20 results
+[SerpApi] Page 1 for "pizzeria": 20 results
+[SerpApi] Page 1 for "pub": 20 results
+[SerpApi] Page 1 for "bar": 20 results
+[SerpApi] Page 1 for "trattoria": 20 results
+[SerpApi] Page 1 for "pizzeria": 20 results
+[SerpApi] Page 1 for "pizzeria": 20 results
+[SerpApi] Page 1 for "bar": 20 results
+[SerpApi] Page 1 for "trattoria": 20 results
+[SerpApi] Page 0 for "ristorante": 20 results
+[SerpApi] Page 2 for "pub": 20 results
+[SerpApi] Page 1 for "trattoria": 20 results
+[SerpApi] Page 1 for "trattoria": 20 results
+[SerpApi] Page 1 for "bar": 20 results
+[SerpApi] Page 1 for "pizzeria": 20 results
+[SerpApi] Page 1 for "ristorante": 20 results
+[SerpApi] Page 0 for "trattoria": 20 results
+[SerpApi] Page 1 for "ristorante": 20 results
+[SerpApi] Page 1 for "pub": 20 results
+[SerpApi] Page 1 for "pub": 20 results
+[SerpApi] Page 1 for "pizzeria": 20 results
+[SerpApi] Page 2 for "bar": 20 results
+[SerpApi] Page 1 for "trattoria": 20 results
+[SerpApi] Page 1 for "ristorante": 20 results
+[SerpApi] Page 2 for "pizzeria": 20 results
+[SerpApi] Page 1 for "ristorante": 20 results
+[SerpApi] Page 1 for "pizzeria": 20 results
+[SerpApi] Page 1 for "bar": 20 results
+[SerpApi] Page 2 for "bar": 20 results
+[SerpApi] Page 2 for "trattoria": 20 results
+[SerpApi] Page 2 for "ristorante": 20 results
+[SerpApi] Page 1 for "trattoria": 20 results
+[SerpApi] Page 2 for "pizzeria": 20 results
+[SerpApi] Page 2 for "pizzeria": 20 results
+[SerpApi] Page 2 for "pub": 20 results
+[SerpApi] Page 2 for "pizzeria": 20 results
+[SerpApi] Page 2 for "pub": 20 results
+[SerpApi] Page 2 for "pizzeria": 20 results
+[SerpApi] Page 0 for "pub": 20 results
+[SerpApi] Page 1 for "trattoria": 20 results
+[SerpApi] Page 2 for "pizzeria": 20 results
+[SerpApi] Page 1 for "bar": 20 results
+[SerpApi] Page 2 for "pub": 20 results
+[SerpApi] Page 2 for "bar": 20 results
+[SerpApi] Page 1 for "trattoria": 20 results
+[SerpApi] Page 2 for "bar": 20 results
+[SerpApi] Page 2 for "trattoria": 20 results
+[SerpApi] Page 2 for "trattoria": 20 results
+[SerpApi] Page 2 for "ristorante": 20 results
+[SerpApi] Page 2 for "bar": 20 results
+[SerpApi] Page 0 for "pizzeria": 20 results
+[SerpApi] Page 2 for "ristorante": 20 results
+[SerpApi] Page 2 for "pub": 20 results
+[SerpApi] Page 1 for "trattoria": 20 results
+[SerpApi] Page 2 for "bar": 20 results
+[SerpApi] Page 2 for "ristorante": 20 results
+[SerpApi] Page 2 for "ristorante": 20 results
+[SerpApi] Page 1 for "ristorante": 20 results
+[SerpApi] Page 2 for "trattoria": 20 results
+[SerpApi] Page 2 for "ristorante": 20 results
+[SerpApi] Page 2 for "bar": 20 results
+[SerpApi] Page 2 for "pizzeria": 20 results
+[SerpApi] Page 2 for "trattoria": 20 results
+[SerpApi] Page 1 for "ristorante": 20 results
+[SerpApi] Page 1 for "pub": 20 results
+[SerpApi] Page 2 for "trattoria": 20 results
+[SerpApi] Page 2 for "trattoria": 20 results
+[SerpApi] Total unique places: 216
+[SerpApi] Page 1 for "pizzeria": 20 results
+[SerpApi] Page 0 for "pub": 20 results
+[SerpApi] Page 0 for "pub": 20 results
+[SerpApi] Error for "pizzeria" page 2: {
+  "error": "Your account has run out of searches."
+}
+[SerpApi] Page 1 for "pizzeria": 20 results
+[SerpApi] Page 0 for "trattoria": 20 results
+[SerpApi] Error for "pizzeria" page 2: {
+  "error": "Your account has run out of searches."
+}
+[SerpApi] Page 2 for "ristorante": 20 results
+[SerpApi] Total unique places: 180
+[SerpApi] Page 0 for "bar": 20 results
+[SerpApi] Page 2 for "pizzeria": 20 results
+[SerpApi] Error for "bar" page 1: {
+  "error": "Your account has run out of searches."
+}
+[SerpApi] Page 1 for "pub": 20 results
+[SerpApi] Page 0 for "ristorante": 20 results
+[SerpApi] Page 2 for "pub": 20 results
+[SerpApi] Page 1 for "bar": 20 results
+[SerpApi] Error for "ristorante" page 1: {
+  "error": "Your account has run out of searches."
+}
+[SerpApi] Error for "pub" page 2: {
+  "error": "Your account has run out of searches."
+}
+[SerpApi] Total unique places: 188
+[SerpApi] Error for "bar" page 2: {
+  "error": "Your account has run out of searches."
+}
+[SerpApi] Page 1 for "pub": 20 results
+[SerpApi] Error for "pub" page 2: {
+  "error": "Your account has run out of searches."
+}
+[SerpApi] Page 1 for "trattoria": 20 results
+[SerpApi] Error for "trattoria" page 2: {
+  "error": "Your account has run out of searches."
+}
+[SerpApi] Total unique places: 177
+[SerpApi] Page 2 for "ristorante": 20 results
+[SerpApi] Page 2 for "bar": 20 results
+[SerpApi] Total unique places: 162
+[SerpApi] Page 2 for "trattoria": 20 results
+[SerpApi] Total unique places: 197
+[SerpApi] Page 1 for "pub": 20 results
+[SerpApi] Error for "pub" page 2: {
+  "error": "Your account has run out of searches."
+}
+[SerpApi] Total unique places: 190
+[SerpApi] Page 2 for "trattoria": 20 results
+[SerpApi] Total unique places: 188
+[SerpApi] Page 0 for "pub": 20 results
+[SerpApi] Error for "pub" page 1: {
+  "error": "Your account has run out of searches."
+}
+[SerpApi] Total unique places: 194
+[SerpApi] Page 2 for "ristorante": 20 results
+[SerpApi] Total unique places: 174
+[RegionScan] Totale raw (pre-dedup): 729
+[RegionScan] Totale dopo dedup: 729
+ POST /api/providers/search 200 in 17390ms
