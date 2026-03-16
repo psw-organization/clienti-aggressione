@@ -188,7 +188,7 @@ export default async function LeadDetailPage({ params }: any) {
           <TabsTrigger value="overview"  className="h-7 gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm"><Building2 className="h-3.5 w-3.5" />Panoramica</TabsTrigger>
           <TabsTrigger value="contacts"  className="h-7 gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm"><Phone className="h-3.5 w-3.5" />Contatti</TabsTrigger>
           <TabsTrigger value="analysis"  className="h-7 gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm"><BarChart3 className="h-3.5 w-3.5" />Analisi</TabsTrigger>
-          <TabsTrigger value="notes"     className="h-7 gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm"><StickyNote className="h-3.5 w-3.5" />Note</TabsTrigger>
+          <TabsTrigger id="notes-tab" value="notes" className="h-7 gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm"><StickyNote className="h-3.5 w-3.5" />Note</TabsTrigger>
           <TabsTrigger value="raw"       className="h-7 gap-1.5 text-xs data-[state=active]:bg-card data-[state=active]:shadow-sm"><FileJson className="h-3.5 w-3.5" />Dati raw</TabsTrigger>
         </TabsList>
 
@@ -254,6 +254,18 @@ export default async function LeadDetailPage({ params }: any) {
                   ))}
                 </div>
               </div>
+
+              {lead.internalNotes && (
+                <div className="bento-card p-4">
+                  <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-2 flex items-center gap-1.5">
+                    <StickyNote className="h-3.5 w-3.5" />Note
+                  </h3>
+                  <p className="text-xs text-foreground whitespace-pre-wrap leading-relaxed line-clamp-6">{lead.internalNotes}</p>
+                  <a href="#notes-tab" className="text-[10px] text-primary hover:underline mt-2 inline-block">
+                    Modifica →
+                  </a>
+                </div>
+              )}
 
               <div className="bento-card p-4">
                 <h3 className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3 flex items-center gap-1.5">
