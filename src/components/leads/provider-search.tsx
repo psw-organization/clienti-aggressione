@@ -226,6 +226,7 @@ export function ProviderSearch({ providers }: { providers: ProviderOption[] }) {
 
   const [loading, setLoading] = useState(false)
   const [scraping, setScraping] = useState(false)
+  const [scrapeProgress, setScrapeProgress] = useState<{ current: number; total: number; found: number } | null>(null)
   const [importing, setImporting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [jobId, setJobId] = useState<string | null>(null)
@@ -327,47 +328,45 @@ export function ProviderSearch({ providers }: { providers: ProviderOption[] }) {
   }
 
   async function scrapeEmails() {
-    if (!items.length) return
+    // Solo i lead selezionati senza email già trovata
+    const candidates = items.filter((i) => selected[i.externalId] && !i.email)
+    if (!candidates.length) return
+
     setScraping(true)
     setError(null)
-    
-    try {
-      const candidates = items.map(i => ({
-        id: i.externalId,
-        businessName: i.businessName,
-        websiteUrl: i.websiteUrl,
-        city: i.city,
-      }))
+    setScrapeProgress({ current: 0, total: candidates.length, found: 0 })
 
-      if (candidates.length === 0) {
-        throw new Error("Nessun lead da analizzare")
-      }
-
-      const res = await fetch("/api/leads/scrape-emails", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ items: candidates })
-      })
-
-      if (!res.ok) throw new Error("Scraping failed")
-
-      const { results } = await res.json()
-      
-      // Aggiorna la tabella con le email trovate
-      const emailMap = new Map(results.map((r: any) => [r.id, r.email]))
-      
-      setItems(prev => prev.map(item => {
-        if (emailMap.has(item.externalId)) {
-          return { ...item, email: emailMap.get(item.externalId) as string }
+    let found = 0
+    for (let i = 0; i < candidates.length; i++) {
+      const item = candidates[i]
+      setScrapeProgress({ current: i, total: candidates.length, found })
+      try {
+        const res = await fetch("/api/leads/scrape-emails", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            items: [{ id: item.externalId, businessName: item.businessName, websiteUrl: item.websiteUrl, city: item.city }],
+          }),
+        })
+        if (res.ok) {
+          const { results } = await res.json()
+          if (results?.[0]?.email) {
+            found++
+            const email = results[0].email
+            setItems((prev) =>
+              prev.map((it) => it.externalId === item.externalId ? { ...it, email } : it)
+            )
+          }
         }
-        return item
-      }))
-
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Errore Scraping")
-    } finally {
-      setScraping(false)
+      } catch {
+        // ignora errori singoli, continua
+      }
+      setScrapeProgress({ current: i + 1, total: candidates.length, found })
     }
+
+    setScraping(false)
+    // Lascia il riepilogo visibile 4 secondi poi sparisce
+    setTimeout(() => setScrapeProgress(null), 4000)
   }
 
   function exportCsv() {
@@ -488,7 +487,11 @@ export function ProviderSearch({ providers }: { providers: ProviderOption[] }) {
             </Button>
             <Button type="button" variant="outline" onClick={scrapeEmails} disabled={scraping || !items.length}>
               <Mail className="h-4 w-4" />
-              {scraping ? "Analisi..." : "Trova Email"}
+              {scraping
+                ? scrapeProgress
+                  ? `${scrapeProgress.current}/${scrapeProgress.total}`
+                  : "Avvio…"
+                : "Trova Email"}
             </Button>
             <Button type="button" variant="outline" onClick={exportCsv} disabled={!items.length}>
               <Download className="h-4 w-4" />
@@ -500,6 +503,29 @@ export function ProviderSearch({ providers }: { providers: ProviderOption[] }) {
             </Button>
           </div>
         </div>
+
+        {/* Progress bar email scraping */}
+        {scrapeProgress && (
+          <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-medium text-foreground flex items-center gap-1.5">
+                <Mail className="h-3.5 w-3.5 text-primary" />
+                {scraping
+                  ? `Analisi in corso… ${scrapeProgress.current} / ${scrapeProgress.total}`
+                  : `Completato — ${scrapeProgress.current} / ${scrapeProgress.total} analizzati`}
+              </span>
+              <span className={`font-bold ${scrapeProgress.found > 0 ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground"}`}>
+                {scrapeProgress.found} email trovate
+              </span>
+            </div>
+            <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden">
+              <div
+                className="h-full rounded-full bg-primary transition-all duration-300"
+                style={{ width: `${scrapeProgress.total > 0 ? (scrapeProgress.current / scrapeProgress.total) * 100 : 0}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         {error ? <div className="text-sm text-destructive">{error}</div> : null}
         {resolvedProvider ? (
