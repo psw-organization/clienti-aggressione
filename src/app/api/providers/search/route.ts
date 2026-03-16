@@ -12,6 +12,7 @@ const bodySchema = providerSearchSchema.omit({ providerId: true }).extend({
   onlyNoWebsite: z.coerce.boolean().optional(),
   excludeChains: z.coerce.boolean().optional(),
   limit: z.coerce.number().int().min(1).max(100).optional(),
+  categories: z.array(z.string().trim().min(1)).optional(),
 })
 
 export async function POST(req: Request) {

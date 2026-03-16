@@ -169,28 +169,37 @@ export async function runUnifiedProviderSearch({
   query: ProviderSearchQuery
   enabledProviders: Set<ProviderId>
 }): Promise<UnifiedSearchResult> {
+  // Se ci sono più categorie, esegui una ricerca per ognuna e unisci
+  const categoriesToSearch: Array<string | undefined> =
+    query.categories && query.categories.length > 0
+      ? query.categories
+      : [query.category]
+
   const decision = resolveSearchFlowDecision(requestedProvider, query, enabledProviders)
-  const runProvider = async (providerId: ProviderId) => {
+
+  const runProvider = async (providerId: ProviderId, categoryOverride?: string) => {
     const provider = providers[providerId]
-    if (!provider) {
-      throw new Error(`Provider ${providerId} non supportato`)
-    }
-    if (!canUse(providerId, enabledProviders)) {
-      throw new Error(`Provider ${providerId} disabilitato`)
-    }
-    if (!hasCredentials(providerId)) {
-      throw new Error(`Provider ${providerId} non configurato`)
-    }
-    const raw = await provider.search({ ...query, providerId })
+    if (!provider) throw new Error(`Provider ${providerId} non supportato`)
+    if (!canUse(providerId, enabledProviders)) throw new Error(`Provider ${providerId} disabilitato`)
+    if (!hasCredentials(providerId)) throw new Error(`Provider ${providerId} non configurato`)
+    const raw = await provider.search({ ...query, category: categoryOverride, providerId })
     const normalized = raw.map(normalizeLead)
     const reachable = await stripUnreachableWebsites(normalized)
     return dedupeLeads(applyStandardFilters(reachable, query))
   }
 
+  // Ricerca primaria per ogni categoria (batch da 3 in parallelo)
+  const BATCH = 3
   let primaryItems: ProviderLead[] = []
   let primaryError: string | null = null
+
   try {
-    primaryItems = await runProvider(decision.primaryProvider)
+    for (let i = 0; i < categoriesToSearch.length; i += BATCH) {
+      const batch = categoriesToSearch.slice(i, i + BATCH)
+      const results = await Promise.all(batch.map((cat) => runProvider(decision.primaryProvider, cat)))
+      primaryItems.push(...results.flat())
+    }
+    primaryItems = dedupeLeads(primaryItems)
   } catch (error) {
     primaryError = error instanceof Error ? error.message : "Errore provider primario"
     if (requestedProvider !== "auto" || !decision.fallbackProvider) {
@@ -206,7 +215,12 @@ export async function runUnifiedProviderSearch({
     (primaryItems.length < Math.min(query.limit ?? 30, 12) || Boolean(primaryError))
 
   if (shouldUseFallback && decision.fallbackProvider) {
-    fallbackItems = await runProvider(decision.fallbackProvider)
+    for (let i = 0; i < categoriesToSearch.length; i += BATCH) {
+      const batch = categoriesToSearch.slice(i, i + BATCH)
+      const results = await Promise.all(batch.map((cat) => runProvider(decision.fallbackProvider!, cat)))
+      fallbackItems.push(...results.flat())
+    }
+    fallbackItems = dedupeLeads(fallbackItems)
     usedFallback = fallbackItems.length > 0 || Boolean(primaryError)
   }
 

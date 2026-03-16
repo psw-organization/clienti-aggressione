@@ -11,6 +11,7 @@ export const providerSearchSchema = z.object({
   province: z.string().trim().min(1).optional(),
   city: z.string().trim().min(1).optional(),
   category: z.string().trim().min(1).optional(),
+  categories: z.array(z.string().trim().min(1)).optional(),
   ratingMin: z.number().min(0).max(5).optional(),
   reviewsMin: z.number().int().min(0).optional(),
   onlyNoWebsite: z.boolean().optional(),

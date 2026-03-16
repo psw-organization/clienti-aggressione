@@ -1,17 +1,207 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useMemo, useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Search, Upload, Download, Mail } from "lucide-react"
+import { Search, Upload, Download, Mail, ChevronDown, Check, X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import type { ProviderId, ProviderLead, ProviderSearchResponse, ProviderSelection } from "@/lib/providers/types"
+
+// ── Dati categorie ────────────────────────────────────────────────────────────
+const CATEGORY_GROUPS = [
+  {
+    label: "Ristorazione & Food",
+    items: ["ristorante","pizzeria","bar","trattoria","pub","osteria","taverna","rosticceria","braceria","hamburgeria","paninoteca","kebab","sushi","gelateria","pasticceria","panetteria","caffetteria","enoteca","birreria"],
+  },
+  {
+    label: "Hospitality & Turismo",
+    items: ["hotel","bed and breakfast","agriturismo","agenzia viaggi","tour operator"],
+  },
+  {
+    label: "Finanza & Assicurazioni",
+    items: ["banca","agenzia assicurativa","consulente finanziario","intermediazione finanziaria","prestiti","promotore finanziario","cambio valute"],
+  },
+  {
+    label: "Immobiliare & Costruzioni",
+    items: ["agenzia immobiliare","agenzia affitti","costruttore edile","geometra","architetto","impresa di pulizie"],
+  },
+  {
+    label: "Benessere & Salute",
+    items: ["parrucchiere","barbiere","centro estetico","spa","palestra","fisioterapista","dentista","medico","farmacia","ottico","veterinario"],
+  },
+  {
+    label: "Professioni & Consulenza",
+    items: ["avvocato","commercialista","notaio","consulente del lavoro","agenzia marketing","agenzia comunicazione","web agency","agenzia di reclutamento"],
+  },
+  {
+    label: "Commercio & Retail",
+    items: ["negozio abbigliamento","gioielleria","fioraio","libreria","tabaccheria","ferramenta","elettronica","lavanderia","supermercato"],
+  },
+  {
+    label: "Auto & Mobilità",
+    items: ["concessionaria auto","officina meccanica","carrozzeria","autolavaggio","noleggio auto"],
+  },
+  {
+    label: "Istruzione & Cultura",
+    items: ["scuola guida","scuola di musica","centro linguistico","doposcuola","palestra danza"],
+  },
+] as const
+
+const LABEL_MAP: Record<string, string> = {
+  "ristorante": "Ristorante", "pizzeria": "Pizzeria", "bar": "Bar / Caffè", "trattoria": "Trattoria",
+  "pub": "Pub", "osteria": "Osteria", "taverna": "Taverna", "rosticceria": "Rosticceria",
+  "braceria": "Braceria / Griglieria", "hamburgeria": "Hamburgeria", "paninoteca": "Paninoteca",
+  "kebab": "Kebab", "sushi": "Sushi", "gelateria": "Gelateria", "pasticceria": "Pasticceria",
+  "panetteria": "Panetteria / Forno", "caffetteria": "Caffetteria", "enoteca": "Enoteca / Wine Bar",
+  "birreria": "Birreria", "hotel": "Hotel", "bed and breakfast": "B&B", "agriturismo": "Agriturismo",
+  "agenzia viaggi": "Agenzia Viaggi", "tour operator": "Tour Operator", "banca": "Banca",
+  "agenzia assicurativa": "Agenzia Assicurativa", "consulente finanziario": "Consulente Finanziario",
+  "intermediazione finanziaria": "Intermediazione Finanziaria", "prestiti": "Prestiti / Credito",
+  "promotore finanziario": "Promotore Finanziario", "cambio valute": "Cambio Valute",
+  "agenzia immobiliare": "Agenzia Immobiliare", "agenzia affitti": "Agenzia Affitti",
+  "costruttore edile": "Costruttore Edile", "geometra": "Geometra", "architetto": "Architetto",
+  "impresa di pulizie": "Impresa di Pulizie", "parrucchiere": "Parrucchiere", "barbiere": "Barbiere",
+  "centro estetico": "Centro Estetico", "spa": "Spa / Benessere", "palestra": "Palestra / Fitness",
+  "fisioterapista": "Fisioterapista", "dentista": "Dentista", "medico": "Medico / Studio",
+  "farmacia": "Farmacia", "ottico": "Ottico", "veterinario": "Veterinario", "avvocato": "Avvocato",
+  "commercialista": "Commercialista", "notaio": "Notaio", "consulente del lavoro": "Consulente Lavoro",
+  "agenzia marketing": "Agenzia Marketing", "agenzia comunicazione": "Agenzia Comunicazione",
+  "web agency": "Web Agency", "agenzia di reclutamento": "Agenzia Reclutamento",
+  "negozio abbigliamento": "Abbigliamento", "gioielleria": "Gioielleria", "fioraio": "Fioraio",
+  "libreria": "Libreria", "tabaccheria": "Tabaccheria", "ferramenta": "Ferramenta",
+  "elettronica": "Elettronica", "lavanderia": "Lavanderia", "supermercato": "Supermercato",
+  "concessionaria auto": "Concessionaria Auto", "officina meccanica": "Officina Meccanica",
+  "carrozzeria": "Carrozzeria", "autolavaggio": "Autolavaggio", "noleggio auto": "Noleggio Auto",
+  "scuola guida": "Scuola Guida", "scuola di musica": "Scuola di Musica",
+  "centro linguistico": "Centro Linguistico", "doposcuola": "Doposcuola", "palestra danza": "Danza / Arte",
+}
+
+// ── MultiCategorySelect ───────────────────────────────────────────────────────
+function MultiCategorySelect({
+  selected,
+  onChange,
+}: {
+  selected: string[]
+  onChange: (vals: string[]) => void
+}) {
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState("")
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener("mousedown", handler)
+    return () => document.removeEventListener("mousedown", handler)
+  }, [])
+
+  function toggle(val: string) {
+    onChange(selected.includes(val) ? selected.filter((v) => v !== val) : [...selected, val])
+  }
+
+  const filtered = search.trim()
+    ? CATEGORY_GROUPS.map((g) => ({
+        ...g,
+        items: g.items.filter((v) =>
+          (LABEL_MAP[v] ?? v).toLowerCase().includes(search.toLowerCase())
+        ),
+      })).filter((g) => g.items.length > 0)
+    : CATEGORY_GROUPS
+
+  const label =
+    selected.length === 0
+      ? "Tutte le categorie"
+      : selected.length === 1
+      ? (LABEL_MAP[selected[0]] ?? selected[0])
+      : `${selected.length} categorie`
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm hover:bg-accent transition-colors"
+      >
+        <span className={selected.length === 0 ? "text-muted-foreground" : "text-foreground"}>
+          {label}
+        </span>
+        <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0 ml-2" />
+      </button>
+
+      {/* Selected pills */}
+      {selected.length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-1.5">
+          {selected.map((v) => (
+            <span
+              key={v}
+              className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary text-[11px] px-2 py-0.5 font-medium"
+            >
+              {LABEL_MAP[v] ?? v}
+              <button type="button" onClick={() => toggle(v)} className="hover:opacity-70">
+                <X className="h-2.5 w-2.5" />
+              </button>
+            </span>
+          ))}
+          {selected.length > 1 && (
+            <button
+              type="button"
+              onClick={() => onChange([])}
+              className="text-[11px] text-muted-foreground hover:text-foreground px-1"
+            >
+              Cancella tutto
+            </button>
+          )}
+        </div>
+      )}
+
+      {open && (
+        <div className="absolute z-50 mt-1 w-72 rounded-lg border border-border bg-popover shadow-lg overflow-hidden">
+          <div className="p-2 border-b border-border">
+            <input
+              autoFocus
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Cerca categoria…"
+              className="w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+          </div>
+          <div className="max-h-72 overflow-y-auto p-1">
+            {filtered.map((group) => (
+              <div key={group.label}>
+                <div className="px-2 py-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                  {group.label}
+                </div>
+                {group.items.map((val) => (
+                  <button
+                    key={val}
+                    type="button"
+                    onClick={() => toggle(val)}
+                    className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-accent transition-colors"
+                  >
+                    <div className={`flex h-4 w-4 shrink-0 items-center justify-center rounded border ${selected.includes(val) ? "bg-primary border-primary" : "border-input"}`}>
+                      {selected.includes(val) && <Check className="h-2.5 w-2.5 text-primary-foreground" />}
+                    </div>
+                    {LABEL_MAP[val] ?? val}
+                  </button>
+                ))}
+              </div>
+            ))}
+            {filtered.length === 0 && (
+              <p className="py-4 text-center text-sm text-muted-foreground">Nessuna categoria trovata</p>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
 
 export type ProviderOption = {
   providerId: string
@@ -27,7 +217,7 @@ export function ProviderSearch({ providers }: { providers: ProviderOption[] }) {
   const [region, setRegion] = useState("")
   const [province, setProvince] = useState("")
   const [city, setCity] = useState("")
-  const [category, setCategory] = useState("__all__")
+  const [categories, setCategories] = useState<string[]>([])
   const [ratingMin, setRatingMin] = useState("")
   const [reviewsMin, setReviewsMin] = useState("")
   const [onlyNoWebsite, setOnlyNoWebsite] = useState(true)
@@ -72,7 +262,7 @@ export function ProviderSearch({ providers }: { providers: ProviderOption[] }) {
           region: region || undefined,
           province: province || undefined,
           city: city || undefined,
-          category: category && category !== "__all__" ? category : undefined,
+          categories: categories.length > 0 ? categories : undefined,
           ratingMin: ratingMin ? Number(ratingMin) : undefined,
           reviewsMin: reviewsMin ? Number(reviewsMin) : undefined,
           onlyNoWebsite,
@@ -265,127 +455,9 @@ export function ProviderSearch({ providers }: { providers: ProviderOption[] }) {
             <Label>Città</Label>
             <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Napoli" />
           </div>
-          <div className="space-y-2">
-            <Label>Categoria</Label>
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger>
-                <SelectValue placeholder="Tutte le categorie" />
-              </SelectTrigger>
-              <SelectContent className="max-h-80">
-                <SelectItem value="__all__">— Tutte le categorie —</SelectItem>
-
-                <SelectGroup>
-                  <SelectLabel>Ristorazione &amp; Food</SelectLabel>
-                  <SelectItem value="ristorante">Ristorante</SelectItem>
-                  <SelectItem value="pizzeria">Pizzeria</SelectItem>
-                  <SelectItem value="bar">Bar / Caffè</SelectItem>
-                  <SelectItem value="trattoria">Trattoria</SelectItem>
-                  <SelectItem value="pub">Pub</SelectItem>
-                  <SelectItem value="osteria">Osteria</SelectItem>
-                  <SelectItem value="taverna">Taverna</SelectItem>
-                  <SelectItem value="rosticceria">Rosticceria</SelectItem>
-                  <SelectItem value="braceria">Braceria / Griglieria</SelectItem>
-                  <SelectItem value="hamburgeria">Hamburgeria</SelectItem>
-                  <SelectItem value="paninoteca">Paninoteca</SelectItem>
-                  <SelectItem value="kebab">Kebab</SelectItem>
-                  <SelectItem value="sushi">Sushi</SelectItem>
-                  <SelectItem value="gelateria">Gelateria</SelectItem>
-                  <SelectItem value="pasticceria">Pasticceria</SelectItem>
-                  <SelectItem value="panetteria">Panetteria / Forno</SelectItem>
-                  <SelectItem value="caffetteria">Caffetteria</SelectItem>
-                  <SelectItem value="enoteca">Enoteca / Wine Bar</SelectItem>
-                  <SelectItem value="birreria">Birreria</SelectItem>
-                </SelectGroup>
-
-                <SelectGroup>
-                  <SelectLabel>Hospitality &amp; Turismo</SelectLabel>
-                  <SelectItem value="hotel">Hotel</SelectItem>
-                  <SelectItem value="bed and breakfast">B&amp;B</SelectItem>
-                  <SelectItem value="agriturismo">Agriturismo</SelectItem>
-                  <SelectItem value="agenzia viaggi">Agenzia Viaggi</SelectItem>
-                  <SelectItem value="tour operator">Tour Operator</SelectItem>
-                </SelectGroup>
-
-                <SelectGroup>
-                  <SelectLabel>Finanza &amp; Assicurazioni</SelectLabel>
-                  <SelectItem value="banca">Banca</SelectItem>
-                  <SelectItem value="agenzia assicurativa">Agenzia Assicurativa</SelectItem>
-                  <SelectItem value="consulente finanziario">Consulente Finanziario</SelectItem>
-                  <SelectItem value="intermediazione finanziaria">Intermediazione Finanziaria</SelectItem>
-                  <SelectItem value="prestiti">Prestiti / Credito al Consumo</SelectItem>
-                  <SelectItem value="promotore finanziario">Promotore Finanziario</SelectItem>
-                  <SelectItem value="cambio valute">Cambio Valute</SelectItem>
-                </SelectGroup>
-
-                <SelectGroup>
-                  <SelectLabel>Immobiliare &amp; Costruzioni</SelectLabel>
-                  <SelectItem value="agenzia immobiliare">Agenzia Immobiliare</SelectItem>
-                  <SelectItem value="agenzia affitti">Agenzia Affitti</SelectItem>
-                  <SelectItem value="costruttore edile">Costruttore Edile</SelectItem>
-                  <SelectItem value="geometra">Geometra</SelectItem>
-                  <SelectItem value="architetto">Architetto</SelectItem>
-                  <SelectItem value="impresa di pulizie">Impresa di Pulizie</SelectItem>
-                </SelectGroup>
-
-                <SelectGroup>
-                  <SelectLabel>Benessere &amp; Salute</SelectLabel>
-                  <SelectItem value="parrucchiere">Parrucchiere</SelectItem>
-                  <SelectItem value="barbiere">Barbiere</SelectItem>
-                  <SelectItem value="centro estetico">Centro Estetico</SelectItem>
-                  <SelectItem value="spa">Spa / Centro Benessere</SelectItem>
-                  <SelectItem value="palestra">Palestra / Fitness</SelectItem>
-                  <SelectItem value="fisioterapista">Fisioterapista</SelectItem>
-                  <SelectItem value="dentista">Dentista / Studio Dentistico</SelectItem>
-                  <SelectItem value="medico">Medico / Studio Medico</SelectItem>
-                  <SelectItem value="farmacia">Farmacia</SelectItem>
-                  <SelectItem value="ottico">Ottico</SelectItem>
-                  <SelectItem value="veterinario">Veterinario</SelectItem>
-                </SelectGroup>
-
-                <SelectGroup>
-                  <SelectLabel>Professioni &amp; Consulenza</SelectLabel>
-                  <SelectItem value="avvocato">Avvocato / Studio Legale</SelectItem>
-                  <SelectItem value="commercialista">Commercialista / CAF</SelectItem>
-                  <SelectItem value="notaio">Notaio</SelectItem>
-                  <SelectItem value="consulente del lavoro">Consulente del Lavoro</SelectItem>
-                  <SelectItem value="agenzia marketing">Agenzia Marketing</SelectItem>
-                  <SelectItem value="agenzia comunicazione">Agenzia Comunicazione</SelectItem>
-                  <SelectItem value="web agency">Web Agency</SelectItem>
-                  <SelectItem value="agenzia di reclutamento">Agenzia di Reclutamento</SelectItem>
-                </SelectGroup>
-
-                <SelectGroup>
-                  <SelectLabel>Commercio &amp; Retail</SelectLabel>
-                  <SelectItem value="negozio abbigliamento">Abbigliamento / Moda</SelectItem>
-                  <SelectItem value="gioielleria">Gioielleria</SelectItem>
-                  <SelectItem value="fioraio">Fioraio</SelectItem>
-                  <SelectItem value="libreria">Libreria</SelectItem>
-                  <SelectItem value="tabaccheria">Tabaccheria</SelectItem>
-                  <SelectItem value="ferramenta">Ferramenta</SelectItem>
-                  <SelectItem value="elettronica">Negozio Elettronica</SelectItem>
-                  <SelectItem value="lavanderia">Lavanderia</SelectItem>
-                  <SelectItem value="supermercato">Supermercato / Alimentari</SelectItem>
-                </SelectGroup>
-
-                <SelectGroup>
-                  <SelectLabel>Auto &amp; Mobilità</SelectLabel>
-                  <SelectItem value="concessionaria auto">Concessionaria Auto</SelectItem>
-                  <SelectItem value="officina meccanica">Officina Meccanica</SelectItem>
-                  <SelectItem value="carrozzeria">Carrozzeria</SelectItem>
-                  <SelectItem value="autolavaggio">Autolavaggio</SelectItem>
-                  <SelectItem value="noleggio auto">Noleggio Auto</SelectItem>
-                </SelectGroup>
-
-                <SelectGroup>
-                  <SelectLabel>Istruzione &amp; Cultura</SelectLabel>
-                  <SelectItem value="scuola guida">Scuola Guida / Autoscuola</SelectItem>
-                  <SelectItem value="scuola di musica">Scuola di Musica</SelectItem>
-                  <SelectItem value="centro linguistico">Centro Linguistico</SelectItem>
-                  <SelectItem value="doposcuola">Doposcuola / Ripetizioni</SelectItem>
-                  <SelectItem value="palestra danza">Palestra Danza / Arte</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+          <div className="space-y-2 md:col-span-2">
+            <Label>Categorie</Label>
+            <MultiCategorySelect selected={categories} onChange={setCategories} />
           </div>
           <div className="space-y-2">
             <Label>Rating min</Label>
