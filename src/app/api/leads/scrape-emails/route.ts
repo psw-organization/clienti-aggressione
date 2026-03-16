@@ -13,6 +13,8 @@ const bodySchema = z.object({
   ),
 })
 
+const BATCH_SIZE = 3
+
 export async function POST(req: Request) {
   try {
     const json = await req.json()
@@ -23,25 +25,30 @@ export async function POST(req: Request) {
     }
 
     const { items } = parsed.data
+    const results: Array<{ id: string; businessName: string; email: string }> = []
 
-    const promises = items.map(async (item) => {
-      const urlToScrape = item.websiteUrl || null
-      const city = item.city || undefined
+    // Processa in batch per non esaurire i crediti SerpAPI
+    for (let i = 0; i < items.length; i += BATCH_SIZE) {
+      const batch = items.slice(i, i + BATCH_SIZE)
+      const batchResults = await Promise.all(
+        batch.map(async (item) => {
+          try {
+            const email = await scrapeEmailFromUrl(
+              item.websiteUrl ?? null,
+              item.businessName,
+              item.city ?? undefined
+            )
+            if (email) return { id: item.id, businessName: item.businessName, email }
+          } catch (e) {
+            console.error(`Scrape failed for ${item.businessName}:`, e)
+          }
+          return null
+        })
+      )
+      results.push(...batchResults.filter((r): r is NonNullable<typeof r> => r !== null))
+    }
 
-      try {
-        const email = await scrapeEmailFromUrl(urlToScrape, item.businessName, city)
-        if (email) {
-          return { id: item.id, businessName: item.businessName, email }
-        }
-      } catch (e) {
-        console.error(`Scrape failed for ${item.businessName}:`, e)
-      }
-      return null
-    })
-
-    const scrapedData = (await Promise.all(promises)).filter(Boolean)
-
-    return NextResponse.json({ results: scrapedData })
+    return NextResponse.json({ results })
   } catch (error) {
     console.error("Scrape API error:", error)
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 })
