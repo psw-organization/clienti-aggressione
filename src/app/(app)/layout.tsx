@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { LogOut, Search, Settings, LayoutGrid, List, Zap, Users, Star } from "lucide-react"
+import Image from "next/image"
+import { LogOut, Search, Settings, LayoutGrid, List, Users, Star } from "lucide-react"
 
 import { ThemeToggle } from "@/components/theme-toggle"
 import { createServerSupabaseClient } from "@/lib/supabase/server"
@@ -31,9 +32,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
         {/* Brand */}
         <div className="flex items-center gap-2.5 px-5 h-16 border-b border-border shrink-0">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow">
-            <Zap className="h-4 w-4" />
-          </div>
+          <Image src="/psw-logo.png" alt="PSW Logo" width={32} height={32} className="shrink-0" />
           <div>
             <div className="text-sm font-bold tracking-tight text-foreground">LeadHub</div>
             <div className="text-[10px] text-muted-foreground">Providence Studio</div>
@@ -106,9 +105,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       {/* ── MOBILE TOPBAR ── */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-30 h-14 sidebar-panel flex items-center justify-between px-4">
         <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <Zap className="h-3.5 w-3.5" />
-          </div>
+          <Image src="/psw-logo.png" alt="PSW Logo" width={28} height={28} className="shrink-0" />
           <span className="text-sm font-bold">LeadHub</span>
         </div>
         <div className="flex items-center gap-2">

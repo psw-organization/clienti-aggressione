@@ -8,6 +8,11 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 export const metadata: Metadata = {
   title: "LeadHub — Providence Studio Web",
   description: "Tool interno per ricerca e gestione lead con scoring, board e tracciamento.",
+  icons: {
+    icon: "/psw-logo.png",
+    shortcut: "/psw-logo.png",
+    apple: "/psw-logo.png",
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
