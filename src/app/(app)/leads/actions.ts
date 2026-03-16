@@ -100,6 +100,20 @@ export async function deleteLeadAction(leadId: string) {
   revalidatePath("/leads")
 }
 
+export async function updateLeadNotesAction(leadId: string, formData: FormData) {
+  const notes = formData.get("internalNotes")
+  const value = typeof notes === "string" ? notes.trim() : null
+
+  const { error } = await supabaseAdmin
+    .from("Lead")
+    .update({ internalNotes: value || null })
+    .eq("id", leadId)
+
+  if (error) throw new Error(error.message)
+
+  revalidatePath(`/leads/${leadId}`)
+}
+
 export async function updateLeadAction(leadId: string, formData: FormData) {
   const raw = Object.fromEntries(formData.entries())
   const parsed = leadUpsertSchema.safeParse(raw)

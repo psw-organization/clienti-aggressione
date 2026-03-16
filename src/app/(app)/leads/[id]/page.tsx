@@ -5,7 +5,8 @@ import {
   BarChart3, FileJson, StickyNote, History, Star, ExternalLink, Copy
 } from "lucide-react"
 
-import { updateLeadAction, updateLeadStatusAction } from "@/app/(app)/leads/actions"
+import { updateLeadAction, updateLeadNotesAction, updateLeadStatusAction } from "@/app/(app)/leads/actions"
+import { NotesForm } from "@/components/leads/notes-form"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -408,17 +409,10 @@ export default async function LeadDetailPage({ params }: any) {
           <div className="bento-card p-5">
             <h2 className="text-sm font-semibold text-foreground mb-1">Note Interne</h2>
             <p className="text-xs text-muted-foreground mb-4">Appunti privati — visibili solo al team</p>
-            <form action={updateLeadAction.bind(null, lead.id)}>
-              <Textarea
-                name="internalNotes"
-                defaultValue={lead.internalNotes ?? ""}
-                className="min-h-[280px] font-mono text-sm bg-muted/30 border-border"
-                placeholder="Scrivi le tue note su questo lead…"
-              />
-              <div className="flex justify-end pt-3">
-                <Button type="submit" size="sm">Salva Note</Button>
-              </div>
-            </form>
+            <NotesForm
+              action={updateLeadNotesAction.bind(null, lead.id)}
+              defaultValue={lead.internalNotes}
+            />
           </div>
         </TabsContent>
 
